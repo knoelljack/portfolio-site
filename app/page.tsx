@@ -1,9 +1,12 @@
-import { Hero } from './components/Hero';
+import { HeroHeader } from './components/HeroHeader';
 
 export default function Home() {
   return (
-    <div>
-      <Hero />
-    </div>
+    <>
+      <HeroHeader />
+      <div className="h-screen w-full bg-black text-white">
+        <h1>Hello</h1>
+      </div>
+    </>
   );
 }
