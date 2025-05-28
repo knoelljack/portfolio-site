@@ -30,7 +30,7 @@ export default function Home() {
   const containerRef = useRef(null);
 
   return (
-    <div ref={containerRef} className="carousel-container relative bg-black overflow-x-hidden">
+    <div ref={containerRef} className="relative bg-black">
       <div id="home">
         <HeroHeader />
       </div>

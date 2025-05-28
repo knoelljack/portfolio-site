@@ -18,9 +18,9 @@ const AnimatedLetter = ({
   useEffect(() => {
     setIsClient(true);
     setRandomValues({
-      x: (Math.random() - 0.5) * 1000,
-      y: (Math.random() - 0.5) * 1000,
-      rotate: (Math.random() - 0.5) * 720,
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 400,
+      rotate: (Math.random() - 0.5) * 360,
     });
   }, []);
 

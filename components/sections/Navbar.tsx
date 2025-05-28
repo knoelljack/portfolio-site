@@ -65,7 +65,7 @@ function MobileNavigation() {
   return (
     <>
       {/* Mobile Hamburger Button */}
-      <div className="md:hidden">
+      <div className="md:hidden fixed right-6 top-6 z-[100]">
         <Button
           variant="ghost"
           size="icon"
@@ -84,6 +84,20 @@ function MobileNavigation() {
           className="w-screen max-w-[100vw] h-screen p-0 bg-black border-0 outline-none pt-24 overflow-hidden"
         >
           <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+
+          {/* Hamburger Button Inside Sheet */}
+          <div className="fixed right-6 top-6 z-50">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white !h-16 !w-16 !p-0 border-0 hover:bg-transparent relative"
+              onClick={() => setIsOpen(false)}
+            >
+              <HamburgerButton isOpen={isOpen} />
+              <span className="sr-only">Close menu</span>
+            </Button>
+          </div>
+
           <nav className="flex flex-col h-full">
             <div className="flex flex-col space-y-8 p-8">
               {navItems.map((item, index) => (
