@@ -49,7 +49,7 @@ export function ContactSection() {
             <motion.div
               key={contact.title}
               className="bg-gray-900 p-6 rounded-lg hover:bg-gray-800 transition-colors"
-              initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 + idx * 0.1 }}
               viewport={{ once: true }}

@@ -18,9 +18,9 @@ const AnimatedLetter = ({
   useEffect(() => {
     setIsClient(true);
     setRandomValues({
-      x: (Math.random() - 0.5) * 1000,
-      y: (Math.random() - 0.5) * 1000,
-      rotate: (Math.random() - 0.5) * 720,
+      x: (Math.random() - 0.5) * 400,
+      y: (Math.random() - 0.5) * 400,
+      rotate: (Math.random() - 0.5) * 360,
     });
   }, []);
 
@@ -100,9 +100,9 @@ export function HeroHeader() {
       ref={ref}
       className="h-screen w-full flex items-center justify-center bg-black text-white overflow-hidden"
     >
-      <div className="container px-4 py-32 mx-auto">
-        <div className="text-left">
-          <h1 className="text-[clamp(3rem,12vw,9rem)] font-medium tracking-tight mb-8">
+      <div className="container px-4 py-32 mx-auto overflow-hidden">
+        <div className="text-left overflow-hidden">
+          <h1 className="text-[clamp(3rem,12vw,9rem)] font-medium tracking-tight mb-8 overflow-hidden">
             <AnimatedText text="Hi, " scrollYProgress={scrollYProgress} />
             <AnimatedText text="I'm Jack" scrollYProgress={scrollYProgress} />
           </h1>

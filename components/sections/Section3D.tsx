@@ -25,9 +25,9 @@ const AnimatedLetter = ({
   useEffect(() => {
     setIsClient(true);
     setRandomValues({
-      x: (Math.random() - 0.5) * 800,
-      y: (Math.random() - 0.5) * 800,
-      rotate: (Math.random() - 0.5) * 540,
+      x: (Math.random() - 0.5) * 200,
+      y: (Math.random() - 0.5) * 200,
+      rotate: (Math.random() - 0.5) * 180,
     });
   }, []);
 
@@ -96,9 +96,9 @@ export function Section3D({ children, title, id }: Section3DProps) {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [1, 1, 1, 0]);
 
   return (
-    <section id={id} ref={ref} className="relative bg-black text-white" style={{ height: '200vh' }}>
+    <section id={id} ref={ref} className="relative bg-black text-white min-h-screen pt-20">
       {/* Sticky Title */}
-      <div className="sticky top-16 z-20 bg-black">
+      <div className="sticky top-16 z-20 bg-black w-full">
         <div className="container px-4 mx-auto">
           <motion.div
             style={{
@@ -114,13 +114,13 @@ export function Section3D({ children, title, id }: Section3DProps) {
       </div>
 
       {/* Content that sticks below the title */}
-      <div className="sticky z-10 bg-black" style={{ top: 'calc(4rem + 6rem + 4rem)' }}>
+      <div className="sticky top-32 z-10 bg-black w-full">
         <div className="container px-4 mx-auto">
           <motion.div
             style={{
               opacity: contentOpacity,
             }}
-            className="carousel-section w-full py-8"
+            className="w-full py-8 pb-16"
           >
             <SlidingContent>{children}</SlidingContent>
           </motion.div>
@@ -144,7 +144,7 @@ const SlidingContent = ({ children }: { children: React.ReactNode }) => {
           key={index}
           initial={{
             opacity: 0,
-            x: isEven ? -100 : 100,
+            x: isEven ? -50 : 50,
           }}
           animate={
             isInView

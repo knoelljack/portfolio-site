@@ -206,6 +206,7 @@
 /* 3D Carousel Styles */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -213,14 +214,11 @@ body {
 }
 
 .carousel-container {
-  transform-style: preserve-3d;
-  perspective: 1200px;
-  perspective-origin: center center;
+  /* Removed transform-style and perspective that can interfere with sticky positioning */
 }
 
 .carousel-section {
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
+  /* Removed transform-style properties */
   will-change: transform, opacity;
 }
 
