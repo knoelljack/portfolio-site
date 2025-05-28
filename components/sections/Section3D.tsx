@@ -21,6 +21,7 @@ const AnimatedLetter = ({
 }) => {
   const [randomValues, setRandomValues] = useState({ x: 0, y: 0, rotate: 0 });
   const [isClient, setIsClient] = useState(false);
+  const isUnderscore = letter === '_';
 
   useEffect(() => {
     setIsClient(true);
@@ -37,7 +38,7 @@ const AnimatedLetter = ({
 
   return (
     <motion.span
-      className="inline-block"
+      className={`inline-block ${isUnderscore ? 'animate-pulse' : ''}`}
       initial={{
         opacity: 0,
         x: randomValues.x,
@@ -114,7 +115,7 @@ export function Section3D({ children, title, id }: Section3DProps) {
       </div>
 
       {/* Content that sticks below the title */}
-      <div className="sticky top-32 z-10 bg-black w-full">
+      <div className="sticky top-48 z-10 bg-black w-full">
         <div className="container px-4 mx-auto">
           <motion.div
             style={{
