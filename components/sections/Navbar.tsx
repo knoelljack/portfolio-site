@@ -16,7 +16,6 @@ import { HamburgerButton } from '@/components/ui/hamburger-button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/#home', label: 'Home' },
   { href: '/#projects', label: 'Projects' },
   { href: '/#about', label: 'About' },
   { href: '/#contact', label: 'Contact' },
