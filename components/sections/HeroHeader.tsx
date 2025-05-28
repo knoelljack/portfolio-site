@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 const AnimatedLetter = ({
   letter,
@@ -12,28 +12,36 @@ const AnimatedLetter = ({
   index: number;
   scrollYProgress: any;
 }) => {
-  const randomX = (Math.random() - 0.5) * 1000;
-  const randomY = (Math.random() - 0.5) * 1000;
-  const randomRotate = (Math.random() - 0.5) * 720;
+  const [randomValues, setRandomValues] = useState({ x: 0, y: 0, rotate: 0 });
+  const [isClient, setIsClient] = useState(false);
 
-  const x = useTransform(scrollYProgress, [0, 0.5], [0, randomX]);
+  useEffect(() => {
+    setIsClient(true);
+    setRandomValues({
+      x: (Math.random() - 0.5) * 1000,
+      y: (Math.random() - 0.5) * 1000,
+      rotate: (Math.random() - 0.5) * 720,
+    });
+  }, []);
 
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, randomY]);
-
-  const rotate = useTransform(scrollYProgress, [0, 0.5], [0, randomRotate]);
-
+  const x = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.x]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.y]);
+  const rotate = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.rotate]);
   const opacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  if (!isClient) {
+    return <span className="inline-block opacity-0">{letter === ' ' ? '\u00A0' : letter}</span>;
+  }
 
   return (
     <motion.span
       className="inline-block"
       initial={{
         opacity: 0,
-        x: randomX,
-        y: randomY,
-        rotate: randomRotate,
+        x: randomValues.x,
+        y: randomValues.y,
+        rotate: randomValues.rotate,
         scale: 0,
       }}
       animate={{
@@ -65,7 +73,7 @@ const AnimatedLetter = ({
 
 const AnimatedText = ({ text, scrollYProgress }: { text: string; scrollYProgress: any }) => {
   return (
-    <div className="overflow-visible">
+    <div className="overflow-visible whitespace-nowrap">
       {text.split('').map((letter, index) => (
         <AnimatedLetter
           key={index}
