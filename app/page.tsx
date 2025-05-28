@@ -1,4 +1,4 @@
-import { HeroHeader } from './components/HeroHeader';
+import { HeroHeader } from '@/components/sections/HeroHeader';
 
 export default function Home() {
   return (

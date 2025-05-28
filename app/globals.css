@@ -119,4 +119,9 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Prevent scrolling when sheet is open */
+  body[data-sheet-open] {
+    overflow: hidden;
+  }
 }
