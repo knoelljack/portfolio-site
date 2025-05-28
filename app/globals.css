@@ -202,3 +202,36 @@
     background-position: 400% 0%;
   }
 }
+
+/* 3D Carousel Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.carousel-container {
+  transform-style: preserve-3d;
+  perspective: 1200px;
+  perspective-origin: center center;
+}
+
+.carousel-section {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Smooth scrolling for better performance */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced perspective for mobile */
+@media (max-width: 768px) {
+  .carousel-container {
+    perspective: 800px;
+  }
+}
