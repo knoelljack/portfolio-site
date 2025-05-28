@@ -1,27 +1,52 @@
+'use client';
+
 import { HeroHeader } from '@/components/sections/HeroHeader';
+import { Navbar } from '@/components/sections/Navbar';
+import { Section3D } from '@/components/sections/Section3D';
+import { ProjectsSection } from '@/components/sections/ProjectsSection';
+import { AboutSection } from '@/components/sections/AboutSection';
+import { ContactSection } from '@/components/sections/ContactSection';
+import { useRef } from 'react';
+import type { Section } from '@/lib/types';
+
+const sections: Section[] = [
+  {
+    id: 'about',
+    title: 'About',
+    component: AboutSection,
+  },
+  {
+    id: 'projects',
+    title: 'Projects',
+    component: ProjectsSection,
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    component: ContactSection,
+  },
+];
 
 export default function Home() {
+  const containerRef = useRef(null);
+
   return (
     <>
-      <HeroHeader />
-      <section id="projects" className="min-h-screen bg-black text-white p-8">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold mb-8">Projects</h2>
-          {/* Projects content */}
+      <Navbar />
+      <div ref={containerRef} className="carousel-container relative bg-black">
+        <div id="home">
+          <HeroHeader />
         </div>
-      </section>
-      <section id="about" className="min-h-screen bg-black text-white p-8">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold mb-8">About</h2>
-          {/* About content */}
-        </div>
-      </section>
-      <section id="contact" className="min-h-screen bg-black text-white p-8">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold mb-8">Contact</h2>
-          {/* Contact content */}
-        </div>
-      </section>
+
+        {sections.map((section) => {
+          const SectionComponent = section.component;
+          return (
+            <Section3D key={section.id} title={section.title} id={section.id}>
+              <SectionComponent />
+            </Section3D>
+          );
+        })}
+      </div>
     </>
   );
 }

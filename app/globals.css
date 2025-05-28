@@ -202,3 +202,65 @@
     background-position: 400% 0%;
   }
 }
+
+/* 3D Carousel Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.carousel-container {
+  transform-style: preserve-3d;
+  perspective: 1200px;
+  perspective-origin: center center;
+}
+
+.carousel-section {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Smooth scrolling for better performance */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced perspective for mobile */
+@media (max-width: 768px) {
+  .carousel-container {
+    perspective: 800px;
+  }
+}
+
+/* Navigation active state animation */
+.nav-active {
+  position: relative;
+}
+
+.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  animation: nav-glow 2s ease-in-out infinite;
+}
+
+@keyframes nav-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scaleX(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
