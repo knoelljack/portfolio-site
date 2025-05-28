@@ -3,6 +3,12 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 
+const generateRandomValues = () => ({
+  x: (Math.random() - 0.5) * 1000,
+  y: (Math.random() - 0.5) * 1000,
+  rotate: (Math.random() - 0.5) * 720,
+});
+
 const AnimatedLetter = ({
   letter,
   index,
@@ -12,18 +18,12 @@ const AnimatedLetter = ({
   index: number;
   scrollYProgress: any;
 }) => {
-  const randomX = (Math.random() - 0.5) * 1000;
-  const randomY = (Math.random() - 0.5) * 1000;
-  const randomRotate = (Math.random() - 0.5) * 720;
+  const randomRef = useRef(generateRandomValues());
 
-  const x = useTransform(scrollYProgress, [0, 0.5], [0, randomX]);
-
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, randomY]);
-
-  const rotate = useTransform(scrollYProgress, [0, 0.5], [0, randomRotate]);
-
+  const x = useTransform(scrollYProgress, [0, 0.5], [0, randomRef.current.x]);
+  const y = useTransform(scrollYProgress, [0, 0.5], [0, randomRef.current.y]);
+  const rotate = useTransform(scrollYProgress, [0, 0.5], [0, randomRef.current.rotate]);
   const opacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
@@ -31,9 +31,9 @@ const AnimatedLetter = ({
       className="inline-block"
       initial={{
         opacity: 0,
-        x: randomX,
-        y: randomY,
-        rotate: randomRotate,
+        x: randomRef.current.x,
+        y: randomRef.current.y,
+        rotate: randomRef.current.rotate,
         scale: 0,
       }}
       animate={{
@@ -65,7 +65,7 @@ const AnimatedLetter = ({
 
 const AnimatedText = ({ text, scrollYProgress }: { text: string; scrollYProgress: any }) => {
   return (
-    <div className="overflow-visible">
+    <div className="overflow-visible whitespace-nowrap">
       {text.split('').map((letter, index) => (
         <AnimatedLetter
           key={index}
