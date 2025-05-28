@@ -40,7 +40,7 @@ export function Navbar() {
 
   return (
     <div className="bg-black">
-      <div className="container flex h-16 items-center px-4 md:justify-start justify-end">
+      <div className="container flex h-16 items-center px-4 md:justify-start justify-end mx-auto">
         {/* Desktop Navigation */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList>

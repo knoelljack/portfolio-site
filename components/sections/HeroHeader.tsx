@@ -101,21 +101,38 @@ export function HeroHeader() {
       className="h-screen w-full flex items-center justify-center bg-black text-white overflow-hidden"
     >
       <div className="container px-4 py-32 mx-auto">
-        <div className="text-center">
-          <h1 className="text-[clamp(2rem,8vw,6rem)] font-medium tracking-tight mb-8">
+        <div className="text-left">
+          <h1 className="text-[clamp(3rem,12vw,9rem)] font-medium tracking-tight mb-8">
             <AnimatedText text="Hi, " scrollYProgress={scrollYProgress} />
             <AnimatedText text="I'm Jack" scrollYProgress={scrollYProgress} />
           </h1>
 
-          <motion.p
+          {/* Scroll Down Arrow */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ opacity: subtitleOpacity }}
-            transition={{ duration: 1.2, delay: 2.5 }}
-            className="text-[clamp(1rem,2vw,1.4rem)] text-neutral-400 text-center mt-8 max-w-2xl mx-auto"
+            transition={{ duration: 1.2, delay: 3.2 }}
+            className="absolute right-8 bottom-8 md:right-16 md:bottom-16"
+            style={{ pointerEvents: 'none' }}
           >
-            Full-stack developer crafting beautiful and functional web experiences
-          </motion.p>
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="24" cy="24" r="24" fill="rgba(255,255,255,0.08)" />
+              <path d="M24 16V32" stroke="white" strokeWidth="3" strokeLinecap="round" />
+              <path
+                d="M18 26L24 32L30 26"
+                stroke="white"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.div>
         </div>
       </div>
     </section>
