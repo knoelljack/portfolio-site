@@ -235,3 +235,32 @@ body {
     perspective: 800px;
   }
 }
+
+/* Navigation active state animation */
+.nav-active {
+  position: relative;
+}
+
+.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  animation: nav-glow 2s ease-in-out infinite;
+}
+
+@keyframes nav-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scaleX(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
