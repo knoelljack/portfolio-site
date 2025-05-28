@@ -206,6 +206,7 @@
 /* 3D Carousel Styles */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -216,6 +217,7 @@ body {
   transform-style: preserve-3d;
   perspective: 1200px;
   perspective-origin: center center;
+  overflow-x: hidden;
 }
 
 .carousel-section {

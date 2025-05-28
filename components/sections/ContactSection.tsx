@@ -44,7 +44,7 @@ export function ContactSection() {
           Let's get in touch! Feel free to reach out for collaborations or just to say hello.
         </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-hidden">
           {contactMethods.map((contact, idx) => (
             <motion.div
               key={contact.title}

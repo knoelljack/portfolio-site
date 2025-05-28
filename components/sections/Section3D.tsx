@@ -74,7 +74,7 @@ const AnimatedTitle = ({ text }: { text: string }) => {
   const isInView = useInView(titleRef, { once: true, margin: '-20%' });
 
   return (
-    <div ref={titleRef} className="overflow-visible">
+    <div ref={titleRef} className="overflow-hidden">
       {text.split('').map((letter, index) => (
         <AnimatedLetter key={index} letter={letter} index={index} shouldAnimate={isInView} />
       ))}
@@ -169,5 +169,9 @@ const SlidingContent = ({ children }: { children: React.ReactNode }) => {
     return child;
   });
 
-  return <div ref={contentRef}>{animatedChildren}</div>;
+  return (
+    <div ref={contentRef} className="overflow-hidden">
+      {animatedChildren}
+    </div>
+  );
 };
