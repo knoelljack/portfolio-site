@@ -132,10 +132,12 @@ function MobileNavigation() {
 export function Navbar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm w-screen max-w-[100vw]">
-      <div className="flex h-16 items-center justify-between px-4 mx-auto max-w-none w-full">
-        <DesktopNavigation />
-        <MobileNavigation />
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-start">
+          <DesktopNavigation />
+        </div>
       </div>
+      <MobileNavigation />
     </div>
   );
 }
