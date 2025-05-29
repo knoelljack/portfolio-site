@@ -20,7 +20,7 @@ const contactMethods: ContactMethod[] = [
   {
     icon: '🐙',
     title: 'GitHub',
-    value: 'github.com/yourprofile',
+    value: 'View profiles',
     description: 'Check out my code',
   },
   {
