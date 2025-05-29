@@ -11,6 +11,7 @@ export interface Project {
   technologies: string[];
   link?: string;
   github?: string;
+  comingSoon?: boolean;
 }
 
 export interface ContactMethod {
