@@ -33,6 +33,7 @@ const contactMethods: ContactMethod[] = [
 
 export function ContactSection() {
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [showGitHubOptions, setShowGitHubOptions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -43,6 +44,7 @@ export function ContactSection() {
 
   const handleBackClick = () => {
     setShowEmailForm(false);
+    setShowGitHubOptions(false);
     setIsSubmitted(false);
   };
 
@@ -58,6 +60,14 @@ export function ContactSection() {
 
   const handleLinkedInClick = () => {
     window.open('https://www.linkedin.com/in/jackknoell/', '_blank');
+  };
+
+  const handleGitHubClick = () => {
+    setShowGitHubOptions(true);
+  };
+
+  const handleGitHubOptionClick = (url: string) => {
+    window.open(url, '_blank');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -240,6 +250,80 @@ export function ContactSection() {
     );
   }
 
+  if (showGitHubOptions) {
+    return (
+      <div className="w-full">
+        <div className="max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center mb-6">
+              <button
+                onClick={handleBackClick}
+                className="flex items-center text-gray-300 hover:text-white transition-colors"
+              >
+                <span className="mr-2">←</span>
+                Back to contact options
+              </button>
+            </div>
+
+            <div className="bg-gray-900 rounded-lg p-8">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center text-xl mr-4">
+                  🐙
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">Choose GitHub Profile</h3>
+                  <p className="text-gray-300">Select which profile you'd like to visit</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <motion.button
+                  onClick={() => handleGitHubOptionClick('https://github.com/knoelljack')}
+                  className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center text-lg">
+                      👤
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Personal</h4>
+                      <p className="text-gray-300 text-sm">github.com/knoelljack</p>
+                      <p className="text-gray-400 text-xs">Personal projects & learning</p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  onClick={() => handleGitHubOptionClick('https://github.com/jack-edenspiekermann')}
+                  className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center text-lg">
+                      💼
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Professional</h4>
+                      <p className="text-gray-300 text-sm">github.com/jack-edenspiekermann</p>
+                      <p className="text-gray-400 text-xs">Work & professional projects</p>
+                    </div>
+                  </div>
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <div className="max-w-2xl mx-auto">
@@ -270,7 +354,9 @@ export function ContactSection() {
                     ? handleResumeClick
                     : contact.title === 'LinkedIn'
                       ? handleLinkedInClick
-                      : undefined
+                      : contact.title === 'GitHub'
+                        ? handleGitHubClick
+                        : undefined
               }
             >
               <div className="flex items-center space-x-4">
