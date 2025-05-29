@@ -6,21 +6,52 @@ import type { Project } from '@/lib/types';
 const projects: Project[] = [
   {
     id: 1,
-    title: 'Project 1',
-    description: 'Description of your project 1...',
-    technologies: ['React', 'TypeScript', 'Next.js'],
+    title: 'Drive Stories',
+    description:
+      'Mobile-first React Native application with CarPlay/Android Auto integration. Features seamless hands-free audio streaming with offline caching and full media-browser integration. Integrated OpenAI-driven backend services for dynamic content generation, boosting personalization and user engagement.',
+    technologies: [
+      'React Native',
+      'TypeScript',
+      'CarPlay API',
+      'Android Auto',
+      'react-native-track-player',
+      'OpenAI API',
+    ],
   },
   {
     id: 2,
-    title: 'Project 2',
-    description: 'Description of your project 2...',
-    technologies: ['React', 'TypeScript', 'Next.js'],
+    title: 'Northern Trust Platform',
+    description:
+      'Full-stack financial platform with comprehensive component library. Built 45+ reusable React components with Java backend integration and AEM CMS. Collaborated directly with client teams to streamline deployment workflows.',
+    technologies: ['React', 'Java', 'AEM CMS', 'TypeScript', 'Component Library'],
   },
   {
     id: 3,
-    title: 'Project 3',
-    description: 'Description of your project 3...',
-    technologies: ['React', 'TypeScript', 'Next.js'],
+    title: 'Vanguard Renewables Site',
+    description:
+      'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
+    technologies: ['Next.js 13', 'TypeScript', 'SCSS', 'GraphQL', 'Performance Optimization'],
+  },
+  {
+    id: 4,
+    title: 'Edenspiekermann Marketing Site',
+    description:
+      'Agency portfolio and marketing website with cutting-edge performance optimization. Achieved sub-second global TTFB with zero runtime errors and enhanced user engagement through advanced animations.',
+    technologies: ['Next.js 14', 'React 18', 'DatoCMS', 'GraphQL Codegen', 'Framer Motion'],
+  },
+  {
+    id: 5,
+    title: 'Selby Lane',
+    description:
+      'Secure financial services client dashboard with robust authentication system. Features JWT-based login, encrypted data transmission, and comprehensive client portfolio management tools designed for financial advisors and their clients.',
+    technologies: ['React', 'TypeScript', 'JWT Authentication', 'Node.js', 'Mailchimp', 'Security'],
+  },
+  {
+    id: 6,
+    title: 'Gwins NFT',
+    description:
+      'High-performance NFT minting website for exclusive 1-of-1 digital collectibles on Solana blockchain. Implemented seamless wallet integration and optimized minting process that enabled 100 unique NFTs to sell out within minutes of launch.',
+    technologies: ['React', 'TypeScript', 'Solana', 'Web3.js', 'Phantom Wallet', 'NFT Metadata'],
   },
 ];
 
