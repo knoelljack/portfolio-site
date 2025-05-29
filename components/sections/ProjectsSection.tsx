@@ -14,7 +14,7 @@ const projects: Project[] = [
       'TypeScript',
       'CarPlay API',
       'Android Auto',
-      'react-native-track-player',
+      'Audio Session Management',
       'OpenAI API',
     ],
     comingSoon: true,
