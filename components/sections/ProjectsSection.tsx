@@ -16,6 +16,9 @@ const projects: Project[] = [
       'Android Auto',
       'Audio Session Management',
       'OpenAI API',
+      'Cloudflare R2',
+      'Cloudflare KV',
+      'Cloudflare Workers',
     ],
     comingSoon: true,
   },
@@ -24,7 +27,15 @@ const projects: Project[] = [
     title: 'Northern Trust Platform',
     description:
       'Full-stack financial platform with comprehensive component library. Built 45+ reusable React components with Java backend integration and AEM CMS. Collaborated directly with client teams to streamline deployment workflows.',
-    technologies: ['React', 'Java', 'AEM CMS', 'TypeScript', 'Component Library', 'Unit Tests'],
+    technologies: [
+      'React',
+      'Java',
+      'AEM CMS',
+      'TypeScript',
+      'Component Library',
+      'Unit Tests',
+      'CI/CD',
+    ],
     link: 'https://www.northerntrust.com/united-states/what-we-do/wealth-management',
   },
   {
@@ -32,7 +43,15 @@ const projects: Project[] = [
     title: 'Vanguard Renewables Site',
     description:
       'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
-    technologies: ['Next.js 13', 'TypeScript', 'SCSS', 'GraphQL', 'Performance Optimization'],
+    technologies: [
+      'Next.js 13',
+      'TypeScript',
+      'SCSS',
+      'GraphQL',
+      'Performance Optimization',
+      'DatoCMS',
+      'Framer Motion',
+    ],
     link: 'https://www.vanguardrenewables.com/',
   },
   {
@@ -40,7 +59,7 @@ const projects: Project[] = [
     title: 'Edenspiekermann Marketing Site',
     description:
       'Agency portfolio and marketing website with cutting-edge performance optimization. Achieved sub-second global TTFB with zero runtime errors and enhanced user engagement through advanced animations.',
-    technologies: ['Next.js 14', 'React 18', 'DatoCMS', 'GraphQL Codegen', 'Framer Motion'],
+    technologies: ['Next.js', 'React', 'DatoCMS', 'GraphQL Codegen', 'Framer Motion'],
     link: 'https://espi-website-2024.netlify.app/',
   },
   {
@@ -48,7 +67,15 @@ const projects: Project[] = [
     title: 'Selby Lane',
     description:
       'Secure financial services client dashboard with robust authentication system. Features JWT-based login, encrypted data transmission, and comprehensive client portfolio management tools designed for financial advisors and their clients.',
-    technologies: ['React', 'TypeScript', 'JWT Authentication', 'Node.js', 'Mailchimp', 'Security'],
+    technologies: [
+      'React',
+      'TypeScript',
+      'JWT Authentication',
+      'Node.js',
+      'Mailchimp',
+      'Security',
+      'AWS Lambda',
+    ],
     link: 'https://selbylane.com/portal',
   },
   {
