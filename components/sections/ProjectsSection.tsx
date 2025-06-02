@@ -44,7 +44,7 @@ const projects: Project[] = [
     description:
       'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
     technologies: [
-      'Next.js 13',
+      'Next.js',
       'TypeScript',
       'SCSS',
       'GraphQL',
