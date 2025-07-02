@@ -24,6 +24,23 @@ const projects: Project[] = [
   },
   {
     id: 2,
+    title: 'BrdSrc',
+    description:
+      'Full-stack surfboard marketplace enabling users to buy and sell surfboards with seamless user experience. Features secure OAuth authentication, comprehensive user profiles, and robust data management. Built with modern web technologies for optimal performance and scalability.',
+    technologies: [
+      'Next.js',
+      'TypeScript',
+      'Prisma',
+      'OAuth',
+      'Google Analytics',
+      'Database Management',
+      'Authentication',
+      'E-commerce',
+    ],
+    link: 'https://www.brdsrc.com',
+  },
+  {
+    id: 3,
     title: 'Northern Trust Platform',
     description:
       'Full-stack financial platform with comprehensive component library. Built 45+ reusable React components with Java backend integration and AEM CMS. Collaborated directly with client teams to streamline deployment workflows.',
@@ -39,7 +56,7 @@ const projects: Project[] = [
     link: 'https://www.northerntrust.com/united-states/what-we-do/wealth-management',
   },
   {
-    id: 3,
+    id: 4,
     title: 'Vanguard Renewables Site',
     description:
       'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
@@ -55,7 +72,7 @@ const projects: Project[] = [
     link: 'https://www.vanguardrenewables.com/',
   },
   {
-    id: 4,
+    id: 5,
     title: 'Edenspiekermann Marketing Site',
     description:
       'Agency portfolio and marketing website with cutting-edge performance optimization. Achieved sub-second global TTFB with zero runtime errors and enhanced user engagement through advanced animations.',
@@ -63,7 +80,7 @@ const projects: Project[] = [
     link: 'https://espi-website-2024.netlify.app/',
   },
   {
-    id: 5,
+    id: 6,
     title: 'Selby Lane',
     description:
       'Secure financial services client dashboard with robust authentication system. Features JWT-based login, encrypted data transmission, and comprehensive client portfolio management tools designed for financial advisors and their clients.',
@@ -79,7 +96,7 @@ const projects: Project[] = [
     link: 'https://selbylane.com/portal',
   },
   {
-    id: 6,
+    id: 7,
     title: 'Gwins NFT',
     description:
       'High-performance NFT minting website for exclusive 1-of-1 digital collectibles on Solana blockchain. Implemented seamless wallet integration and optimized minting process that enabled 100 unique NFTs to sell out within minutes of launch.',
