@@ -10,7 +10,7 @@ const AnimatedLetter = ({
 }: {
   letter: string;
   index: number;
-  scrollYProgress: any;
+  scrollYProgress: import('framer-motion').MotionValue<number>;
 }) => {
   const [randomValues, setRandomValues] = useState({ x: 0, y: 0, rotate: 0 });
   const [isClient, setIsClient] = useState(false);
@@ -71,7 +71,13 @@ const AnimatedLetter = ({
   );
 };
 
-const AnimatedText = ({ text, scrollYProgress }: { text: string; scrollYProgress: any }) => {
+const AnimatedText = ({
+  text,
+  scrollYProgress,
+}: {
+  text: string;
+  scrollYProgress: import('framer-motion').MotionValue<number>;
+}) => {
   return (
     <div className="overflow-visible whitespace-nowrap">
       {text.split('').map((letter, index) => (
@@ -93,7 +99,7 @@ export function HeroHeader() {
     offset: ['start start', 'end start'],
   });
 
-  const subtitleOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  // const subtitleOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
 
   return (
     <section

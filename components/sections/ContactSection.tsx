@@ -77,11 +77,17 @@ export function ContactSection() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    // Convert FormData to URLSearchParams-compatible format
+    const formEntries: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      formEntries[key] = value.toString();
+    });
+
     try {
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData as any).toString(),
+        body: new URLSearchParams(formEntries).toString(),
       });
 
       if (response.ok) {
@@ -129,7 +135,7 @@ export function ContactSection() {
                   Message Sent Successfully!
                 </h3>
                 <p className="text-gray-300">
-                  Thank you for reaching out. I'll get back to you as soon as possible.
+                  Thank you for reaching out. I&apos;ll get back to you as soon as possible.
                 </p>
                 <button
                   onClick={handleBackClick}
@@ -146,7 +152,7 @@ export function ContactSection() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold">Send me a message</h3>
-                    <p className="text-gray-300">I'll get back to you as soon as possible</p>
+                    <p className="text-gray-300">I&apos;ll get back to you as soon as possible</p>
                   </div>
                 </div>
 
@@ -276,7 +282,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold">Choose GitHub Profile</h3>
-                  <p className="text-gray-300">Select which profile you'd like to visit</p>
+                  <p className="text-gray-300">Select which profile you&apos;d like to visit</p>
                 </div>
               </div>
 
@@ -334,7 +340,7 @@ export function ContactSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Let's get in touch! Feel free to reach out for collaborations or just to say hello.
+          Let&apos;s get in touch! Feel free to reach out for collaborations or just to say hello.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

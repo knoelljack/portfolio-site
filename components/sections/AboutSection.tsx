@@ -28,7 +28,7 @@ export function AboutSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          I'm a full-stack developer with expertise in modern web technologies and performance
+          I&apos;m a full-stack developer with expertise in modern web technologies and performance
           optimization. I specialize in building scalable React/Next.js applications, mobile apps
           with React Native, and integrating cutting-edge technologies like AI and blockchain to
           create innovative solutions that solve real-world problems.
