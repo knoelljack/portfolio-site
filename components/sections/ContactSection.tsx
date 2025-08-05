@@ -77,11 +77,17 @@ export function ContactSection() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
+    // Convert FormData to URLSearchParams-compatible format
+    const formEntries: Record<string, string> = {};
+    formData.forEach((value, key) => {
+      formEntries[key] = value.toString();
+    });
+
     try {
       const response = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData as Record<string, string>).toString(),
+        body: new URLSearchParams(formEntries).toString(),
       });
 
       if (response.ok) {
