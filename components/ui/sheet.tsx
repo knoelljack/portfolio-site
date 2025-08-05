@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { X } from 'lucide-react';
+// import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Sheet = ({ children, open, onOpenChange }: SheetPrimitive.DialogProps) => {
@@ -87,15 +87,7 @@ const SheetContent = React.forwardRef<
       <SheetOverlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
       <SheetPrimitive.Content
         ref={ref}
-        className={cn(
-          'fixed inset-y-0 right-0 z-50 h-full w-full bg-black p-6',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[state=closed]:duration-300 data-[state=open]:duration-500',
-          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-          'md:w-3/4 md:max-w-sm',
-          className
-        )}
+        className={cn(sheetVariants({ side }), className)}
         onOpenAutoFocus={(e) => {
           e.preventDefault();
           onOpenAutoFocus?.(e);
