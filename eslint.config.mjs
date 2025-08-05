@@ -10,18 +10,7 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    plugins: {
-      prettier: await import('eslint-plugin-prettier'),
-    },
-    rules: {
-      'prettier/prettier': 'error',
-      'arrow-body-style': 'off',
-      'prefer-arrow-callback': 'off',
-    },
-  },
+  ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
 ];
 
 export default eslintConfig;
