@@ -104,10 +104,10 @@ export function HeroHeader() {
   return (
     <section
       ref={ref}
-      className="h-screen w-full flex items-center justify-center bg-black text-white overflow-hidden"
+      className="h-screen w-full flex items-center justify-center text-white overflow-hidden relative z-10"
     >
-      <div className="container px-4 py-32 mx-auto overflow-hidden">
-        <div className="text-left overflow-hidden">
+      <div className="container px-4 py-32 mx-auto overflow-hidden relative z-10">
+        <div className="text-left overflow-hidden relative z-10">
           <h1 className="text-[clamp(3rem,12vw,9rem)] font-medium tracking-tight mb-8 overflow-hidden">
             <AnimatedText text="Hi, " scrollYProgress={scrollYProgress} />
             <AnimatedText text="I'm Jack" scrollYProgress={scrollYProgress} />
