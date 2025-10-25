@@ -97,9 +97,9 @@ export function Section3D({ children, title, id }: Section3DProps) {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], [1, 1, 1, 0]);
 
   return (
-    <section id={id} ref={ref} className="relative bg-black text-white min-h-screen pt-20">
+    <section id={id} ref={ref} className="relative text-white min-h-screen pt-20">
       {/* Sticky Title */}
-      <div className="sticky top-16 z-20 bg-black w-full">
+      <div className="sticky top-16 z-20 w-full">
         <div className="container px-4 mx-auto">
           <motion.div
             style={{
@@ -115,7 +115,7 @@ export function Section3D({ children, title, id }: Section3DProps) {
       </div>
 
       {/* Content that sticks below the title */}
-      <div className="sticky top-48 z-10 bg-black w-full">
+      <div className="sticky top-48 z-10 w-full">
         <div className="container px-4 mx-auto">
           <motion.div
             style={{

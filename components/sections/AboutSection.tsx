@@ -13,7 +13,7 @@ const technologies = [
   'MongoDB',
   'Tailwind CSS',
   'Framer Motion',
-  'OpenAI API',
+  'Shopify',
   'Solana',
 ];
 
