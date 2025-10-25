@@ -12,6 +12,10 @@ export interface Project {
   link?: string;
   github?: string;
   comingSoon?: boolean;
+  appStoreLinks?: {
+    apple?: string;
+    google?: string;
+  };
 }
 
 export interface ContactMethod {
