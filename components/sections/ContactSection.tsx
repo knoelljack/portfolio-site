@@ -2,82 +2,28 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import type { ContactMethod } from '@/lib/types';
-
-const contactMethods: ContactMethod[] = [
-  {
-    icon: '📧',
-    title: 'Email',
-    value: 'knoelljack@gmail.com',
-    description: 'Drop me a line',
-  },
-  {
-    icon: '💼',
-    title: 'LinkedIn',
-    value: 'linkedin.com/in/jackknoell',
-    description: "Let's connect",
-  },
-  {
-    icon: '🐙',
-    title: 'GitHub',
-    value: 'View profiles',
-    description: 'Check out my code',
-  },
-  {
-    icon: '📄',
-    title: 'Resume',
-    value: 'Download CV',
-    description: 'View my experience',
-  },
-];
+import { Mail, Linkedin, Github, FileText, User, Briefcase, ArrowLeft, Check } from 'lucide-react';
 
 export function ContactSection() {
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [showGitHubOptions, setShowGitHubOptions] = useState(false);
+  const [activeView, setActiveView] = useState<'main' | 'email' | 'github'>('main');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleEmailClick = () => {
-    setShowEmailForm(true);
+  function handleBack(): void {
+    setActiveView('main');
     setIsSubmitted(false);
-  };
+  }
 
-  const handleBackClick = () => {
-    setShowEmailForm(false);
-    setShowGitHubOptions(false);
-    setIsSubmitted(false);
-  };
+  function handleResumeClick(): void {
+    window.open('/resume.pdf', '_blank');
+  }
 
-  const handleResumeClick = () => {
-    // Create a link element and trigger download
-    const link = document.createElement('a');
-    link.href = '/resume.pdf'; // Path to your resume file in the public folder
-    link.download = 'Jack_Knoell_Resume.pdf'; // Name for the downloaded file
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleLinkedInClick = () => {
-    window.open('https://www.linkedin.com/in/jackknoell/', '_blank');
-  };
-
-  const handleGitHubClick = () => {
-    setShowGitHubOptions(true);
-  };
-
-  const handleGitHubOptionClick = (url: string) => {
-    window.open(url, '_blank');
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
     setIsSubmitting(true);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
-
-    // Convert FormData to URLSearchParams-compatible format
     const formEntries: Record<string, string> = {};
     formData.forEach((value, key) => {
       formEntries[key] = value.toString();
@@ -104,55 +50,59 @@ export function ContactSection() {
     }
   };
 
-  if (showEmailForm) {
+  // Email form view
+  if (activeView === 'email') {
     return (
       <div className="w-full">
-        <div className="max-w-2xl mx-auto">
+        <div className="container px-4 md:px-8 mx-auto max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="flex items-center mb-6">
-              <button
-                onClick={handleBackClick}
-                className="flex items-center text-gray-300 hover:text-white transition-colors"
-              >
-                <span className="mr-2">←</span>
-                Back to contact options
-              </button>
-            </div>
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-8"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to contact options
+            </button>
 
             {isSubmitted ? (
               <motion.div
-                className="bg-green-900/20 border border-green-500/30 rounded-lg p-8 text-center"
-                initial={{ opacity: 0, scale: 0.9 }}
+                className="glass-card rounded-2xl p-12 text-center"
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
               >
-                <div className="text-4xl mb-4">✅</div>
-                <h3 className="text-xl font-semibold text-green-400 mb-2">
-                  Message Sent Successfully!
+                <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 flex items-center justify-center">
+                  <Check className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold font-display text-gradient mb-3">
+                  Message Sent!
                 </h3>
-                <p className="text-gray-300">
-                  Thank you for reaching out. I&apos;ll get back to you as soon as possible.
+                <p className="text-[var(--text-secondary)] mb-6">
+                  Thank you for reaching out. I&apos;ll get back to you soon.
                 </p>
                 <button
-                  onClick={handleBackClick}
-                  className="mt-4 px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                  onClick={handleBack}
+                  className="btn-outline px-6 py-3 rounded-xl"
                 >
                   Send Another Message
                 </button>
               </motion.div>
             ) : (
-              <div className="bg-gray-900 rounded-lg p-8">
-                <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center text-xl mr-4">
-                    📧
+              <div className="glass-card rounded-2xl p-8">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-violet)] flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold">Send me a message</h3>
-                    <p className="text-gray-300">I&apos;ll get back to you as soon as possible</p>
+                    <h3 className="text-xl font-bold font-display text-[var(--text-primary)]">
+                      Send me a message
+                    </h3>
+                    <p className="text-[var(--text-muted)] text-sm">
+                      I&apos;ll get back to you as soon as possible
+                    </p>
                   </div>
                 </div>
 
@@ -164,71 +114,58 @@ export function ContactSection() {
                   onSubmit={handleSubmit}
                   className="space-y-6"
                 >
-                  {/* Netlify form detection */}
                   <input type="hidden" name="form-name" value="contact" />
-
-                  {/* Honeypot field for spam protection */}
                   <div className="hidden">
                     <input name="bot-field" />
                   </div>
 
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                       Name *
                     </label>
                     <input
                       type="text"
-                      id="name"
                       name="name"
                       required
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
+                      className="input-light w-full px-4 py-3 text-[var(--text-primary)]"
                       placeholder="Your name"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                       Email *
                     </label>
                     <input
                       type="email"
-                      id="email"
                       name="email"
                       required
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
+                      className="input-light w-full px-4 py-3 text-[var(--text-primary)]"
                       placeholder="your.email@example.com"
                     />
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="subject"
-                      className="block text-sm font-medium text-gray-300 mb-2"
-                    >
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                       Subject
                     </label>
                     <input
                       type="text"
-                      id="subject"
                       name="subject"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400"
+                      className="input-light w-full px-4 py-3 text-[var(--text-primary)]"
                       placeholder="What's this about?"
                     />
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium text-gray-300 mb-2"
-                    >
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                       Message *
                     </label>
                     <textarea
-                      id="message"
                       name="message"
                       required
-                      rows={6}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 resize-vertical"
+                      rows={5}
+                      className="input-light w-full px-4 py-3 text-[var(--text-primary)] resize-none"
                       placeholder="Your message..."
                     />
                   </div>
@@ -236,11 +173,11 @@ export function ContactSection() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center justify-center"
+                    className="btn-gradient w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Sending...
                       </>
                     ) : (
@@ -256,72 +193,73 @@ export function ContactSection() {
     );
   }
 
-  if (showGitHubOptions) {
+  // GitHub options view
+  if (activeView === 'github') {
     return (
       <div className="w-full">
-        <div className="max-w-2xl mx-auto">
+        <div className="container px-4 md:px-8 mx-auto max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="flex items-center mb-6">
-              <button
-                onClick={handleBackClick}
-                className="flex items-center text-gray-300 hover:text-white transition-colors"
-              >
-                <span className="mr-2">←</span>
-                Back to contact options
-              </button>
-            </div>
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-8"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to contact options
+            </button>
 
-            <div className="bg-gray-900 rounded-lg p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center text-xl mr-4">
-                  🐙
+            <div className="glass-card rounded-2xl p-8">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-xl bg-[var(--text-primary)] flex items-center justify-center">
+                  <Github className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">Choose GitHub Profile</h3>
-                  <p className="text-gray-300">Select which profile you&apos;d like to visit</p>
+                  <h3 className="text-xl font-bold font-display text-[var(--text-primary)]">
+                    Choose GitHub Profile
+                  </h3>
+                  <p className="text-[var(--text-muted)] text-sm">
+                    Select which profile you&apos;d like to visit
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <motion.button
-                  onClick={() => handleGitHubOptionClick('https://github.com/knoelljack')}
-                  className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg transition-colors text-left"
+              <div className="grid gap-4">
+                <motion.a
+                  href="https://github.com/knoelljack"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-card p-6 rounded-xl flex items-center gap-4 hover:shadow-lg transition-shadow"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center text-lg">
-                      👤
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white">Personal</h4>
-                      <p className="text-gray-300 text-sm">github.com/knoelljack</p>
-                      <p className="text-gray-400 text-xs">Personal projects & learning</p>
-                    </div>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-violet-500 to-purple-500 flex items-center justify-center">
+                    <User className="w-6 h-6 text-white" />
                   </div>
-                </motion.button>
+                  <div>
+                    <h4 className="font-semibold text-[var(--text-primary)]">Personal</h4>
+                    <p className="text-sm text-[var(--text-muted)]">github.com/knoelljack</p>
+                  </div>
+                </motion.a>
 
-                <motion.button
-                  onClick={() => handleGitHubOptionClick('https://github.com/jack-edenspiekermann')}
-                  className="bg-gray-800 hover:bg-gray-700 p-6 rounded-lg transition-colors text-left"
+                <motion.a
+                  href="https://github.com/jack-edenspiekermann"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-card p-6 rounded-xl flex items-center gap-4 hover:shadow-lg transition-shadow"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center text-lg">
-                      💼
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white">Professional</h4>
-                      <p className="text-gray-300 text-sm">github.com/jack-edenspiekermann</p>
-                      <p className="text-gray-400 text-xs">Work & professional projects</p>
-                    </div>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-white" />
                   </div>
-                </motion.button>
+                  <div>
+                    <h4 className="font-semibold text-[var(--text-primary)]">Professional</h4>
+                    <p className="text-sm text-[var(--text-muted)]">github.com/jack-edenspiekermann</p>
+                  </div>
+                </motion.a>
               </div>
             </div>
           </motion.div>
@@ -330,53 +268,89 @@ export function ContactSection() {
     );
   }
 
+  // Main view - Bold centered CTA
   return (
     <div className="w-full">
-      <div className="max-w-2xl mx-auto">
-        <motion.p
-          className="text-xl text-gray-300 mb-8 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          Let&apos;s get in touch! Feel free to reach out for collaborations or just to say hello.
-        </motion.p>
+      <div className="container px-4 md:px-8 mx-auto">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Gradient background wash */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-20"
+              style={{
+                background: 'radial-gradient(circle, var(--accent-violet) 0%, transparent 70%)',
+              }}
+            />
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {contactMethods.map((contact, idx) => (
-            <motion.div
-              key={contact.title}
-              className="bg-gray-900 p-6 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
-              initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 + idx * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.02, rotateY: 5 }}
-              onClick={
-                contact.title === 'Email'
-                  ? handleEmailClick
-                  : contact.title === 'Resume'
-                    ? handleResumeClick
-                    : contact.title === 'LinkedIn'
-                      ? handleLinkedInClick
-                      : contact.title === 'GitHub'
-                        ? handleGitHubClick
-                        : undefined
-              }
+          {/* Main CTA text */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-section-title font-display mb-6">
+              <span className="text-[var(--text-primary)]">Let&apos;s create</span>
+              <br />
+              <span className="text-gradient-animated">something great</span>
+            </h2>
+            <p className="text-xl text-[var(--text-secondary)] mb-12 max-w-2xl mx-auto">
+              Ready to bring your ideas to life? I&apos;m always excited to work on new projects
+              and collaborate with great people.
+            </p>
+          </motion.div>
+
+          {/* Contact buttons */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <motion.button
+              onClick={() => setActiveView('email')}
+              className="contact-btn contact-btn-primary"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center text-xl">
-                  {contact.icon}
-                </div>
-                <div>
-                  <h4 className="font-semibold">{contact.title}</h4>
-                  <p className="text-gray-300 text-sm">{contact.description}</p>
-                  <p className="text-gray-400 text-xs">{contact.value}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              <Mail className="w-5 h-5" />
+              <span>Email</span>
+            </motion.button>
+
+            <motion.a
+              href="https://www.linkedin.com/in/jackknoell/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-btn contact-btn-outline"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Linkedin className="w-5 h-5" />
+              <span>LinkedIn</span>
+            </motion.a>
+
+            <motion.button
+              onClick={() => setActiveView('github')}
+              className="contact-btn contact-btn-outline"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Github className="w-5 h-5" />
+              <span>GitHub</span>
+            </motion.button>
+
+            <motion.button
+              onClick={handleResumeClick}
+              className="contact-btn contact-btn-outline"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FileText className="w-5 h-5" />
+              <span>Resume</span>
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     </div>

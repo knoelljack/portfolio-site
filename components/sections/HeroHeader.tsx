@@ -1,146 +1,133 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
-const AnimatedLetter = ({
-  letter,
-  index,
-  scrollYProgress,
-}: {
-  letter: string;
+interface AnimatedCharacterProps {
+  char: string;
   index: number;
-  scrollYProgress: import('framer-motion').MotionValue<number>;
-}) => {
-  const [randomValues, setRandomValues] = useState({ x: 0, y: 0, rotate: 0 });
-  const [isClient, setIsClient] = useState(false);
+}
 
-  useEffect(() => {
-    setIsClient(true);
-    setRandomValues({
-      x: (Math.random() - 0.5) * 400,
-      y: (Math.random() - 0.5) * 400,
-      rotate: (Math.random() - 0.5) * 360,
-    });
-  }, []);
-
-  const x = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.x]);
-  const y = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.y]);
-  const rotate = useTransform(scrollYProgress, [0, 0.5], [0, randomValues.rotate]);
-  const opacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
-  if (!isClient) {
-    return <span className="inline-block opacity-0">{letter === ' ' ? '\u00A0' : letter}</span>;
-  }
-
+function AnimatedCharacter({ char, index }: AnimatedCharacterProps) {
   return (
     <motion.span
       className="inline-block"
-      initial={{
-        opacity: 0,
-        x: randomValues.x,
-        y: randomValues.y,
-        rotate: randomValues.rotate,
-        scale: 0,
-      }}
-      animate={{
-        opacity: 1,
-        x: 0,
-        y: 0,
-        rotate: 0,
-        scale: 1,
-      }}
-      style={{
-        x,
-        y,
-        rotate,
-        opacity,
-        scale,
-      }}
+      initial={{ y: 100, rotateX: -90, opacity: 0 }}
+      animate={{ y: 0, rotateX: 0, opacity: 1 }}
       transition={{
         type: 'spring',
-        damping: 15,
-        stiffness: 80,
-        delay: index * 0.15,
-        duration: 2.5,
+        stiffness: 380,
+        damping: 30,
+        delay: index * 0.04,
       }}
     >
-      {letter === ' ' ? '\u00A0' : letter}
+      {char === ' ' ? '\u00A0' : char}
     </motion.span>
   );
 };
 
-const AnimatedText = ({
-  text,
-  scrollYProgress,
-}: {
+interface AnimatedTextProps {
   text: string;
-  scrollYProgress: import('framer-motion').MotionValue<number>;
-}) => {
+  className?: string;
+}
+
+function AnimatedText({ text, className = '' }: AnimatedTextProps) {
   return (
-    <div className="overflow-visible whitespace-nowrap">
-      {text.split('').map((letter, index) => (
-        <AnimatedLetter
-          key={index}
-          letter={letter}
-          index={index}
-          scrollYProgress={scrollYProgress}
-        />
+    <span className={className}>
+      {text.split('').map((char, index) => (
+        <AnimatedCharacter key={index} char={char} index={index} />
       ))}
-    </div>
+    </span>
   );
-};
+}
 
 export function HeroHeader() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end start'],
-  });
-
-  // const subtitleOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const greeting = "Hi, I'm";
+  const name = 'Jack';
+  const tagline = 'Full-Stack Developer & Creative Technologist';
 
   return (
-    <section
-      ref={ref}
-      className="h-screen w-full flex items-center justify-center text-white overflow-hidden relative z-10"
-    >
-      <div className="container px-4 py-32 mx-auto overflow-hidden relative z-10">
-        <div className="text-left overflow-hidden relative z-10">
-          <h1 className="text-[clamp(3rem,12vw,9rem)] font-medium tracking-tight mb-8 overflow-hidden">
-            <AnimatedText text="Hi, " scrollYProgress={scrollYProgress} />
-            <AnimatedText text="I'm Jack" scrollYProgress={scrollYProgress} />
+    <section className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
+      <div className="container px-4 md:px-8 mx-auto relative z-10">
+        <div className="max-w-5xl">
+          {/* Main heading */}
+          <h1 className="text-display font-display mb-6">
+            <div className="text-[var(--text-primary)]">
+              <AnimatedText text={greeting} />
+            </div>
+            <div className="text-gradient-animated">
+              <AnimatedText text={name} className="block" />
+            </div>
           </h1>
 
-          {/* Scroll Down Arrow */}
-          <motion.div
+          {/* Tagline */}
+          <motion.p
+            className="text-xl md:text-2xl text-[var(--text-secondary)] mb-10 max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 3.2 }}
-            className="absolute right-8 bottom-8 md:right-16 md:bottom-16"
-            style={{ pointerEvents: 'none' }}
+            transition={{ duration: 0.8, delay: 0.8 }}
           >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+            {tagline}
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            className="flex flex-wrap gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+          >
+            <Link
+              href="#projects"
+              className="btn-gradient px-8 py-4 rounded-xl text-lg font-semibold inline-flex items-center gap-2"
             >
-              <circle cx="24" cy="24" r="24" fill="rgba(255,255,255,0.08)" />
-              <path d="M24 16V32" stroke="white" strokeWidth="3" strokeLinecap="round" />
-              <path
-                d="M18 26L24 32L30 26"
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+              View Projects
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </Link>
+            <Link
+              href="#contact"
+              className="btn-outline px-8 py-4 rounded-xl text-lg font-semibold inline-flex items-center gap-2"
+            >
+              Get in Touch
+            </Link>
           </motion.div>
         </div>
       </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1.5 }}
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-sm text-[var(--text-muted)]">Scroll</span>
+          <div className="w-6 h-10 border-2 border-[var(--text-muted)] rounded-full flex justify-center pt-2">
+            <motion.div
+              className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"
+              animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

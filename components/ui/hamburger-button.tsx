@@ -16,7 +16,7 @@ export function HamburgerButton({ isOpen, className }: HamburgerButtonProps) {
       {/* Horizontal line */}
       <div
         className={cn(
-          'absolute top-1/2 left-0 w-full h-[2px] bg-white -translate-y-1/2',
+          'absolute top-1/2 left-0 w-full h-[2px] bg-[var(--text-primary)] -translate-y-1/2',
           'transition-all duration-300'
         )}
       />
@@ -24,7 +24,7 @@ export function HamburgerButton({ isOpen, className }: HamburgerButtonProps) {
       {/* Vertical line */}
       <div
         className={cn(
-          'absolute top-0 left-1/2 w-[2px] h-full bg-white -translate-x-1/2',
+          'absolute top-0 left-1/2 w-[2px] h-full bg-[var(--text-primary)] -translate-x-1/2',
           'transition-all duration-300 ease-in-out',
           isOpen ? 'scale-y-0' : 'scale-y-100'
         )}
