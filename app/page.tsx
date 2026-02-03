@@ -1,48 +1,28 @@
 'use client';
 
 import { HeroHeader } from '@/components/sections/HeroHeader';
-import { Section3D } from '@/components/sections/Section3D';
 import { ProjectsSection } from '@/components/sections/ProjectsSection';
 import { AboutSection } from '@/components/sections/AboutSection';
 import { ContactSection } from '@/components/sections/ContactSection';
-import { useRef } from 'react';
-import type { Section } from '@/lib/types';
-
-const sections: Section[] = [
-  {
-    id: 'about',
-    title: 'About_',
-    component: AboutSection,
-  },
-  {
-    id: 'projects',
-    title: 'Projects_',
-    component: ProjectsSection,
-  },
-  {
-    id: 'contact',
-    title: 'Contact_',
-    component: ContactSection,
-  },
-];
 
 export default function Home() {
-  const containerRef = useRef(null);
-
   return (
-    <div ref={containerRef} className="relative bg-black">
-      <div id="home">
+    <div className="relative bg-[var(--background)]">
+      <section id="home">
         <HeroHeader />
-      </div>
+      </section>
 
-      {sections.map((section) => {
-        const SectionComponent = section.component;
-        return (
-          <Section3D key={section.id} title={section.title} id={section.id}>
-            <SectionComponent />
-          </Section3D>
-        );
-      })}
+      <section id="about" className="py-24 md:py-32">
+        <AboutSection />
+      </section>
+
+      <section id="projects" className="py-24 md:py-32">
+        <ProjectsSection />
+      </section>
+
+      <section id="contact" className="py-24 md:py-32">
+        <ContactSection />
+      </section>
     </div>
   );
 }
