@@ -245,7 +245,7 @@ export function ContactSection() {
                 </motion.a>
 
                 <motion.a
-                  href="https://github.com/jack-edenspiekermann"
+                  href="https://github.com/jack-at-alice"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass-card p-6 rounded-xl flex items-center gap-4 hover:shadow-lg transition-shadow"
@@ -257,7 +257,7 @@ export function ContactSection() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-[var(--text-primary)]">Professional</h4>
-                    <p className="text-sm text-[var(--text-muted)]">github.com/jack-edenspiekermann</p>
+                    <p className="text-sm text-[var(--text-muted)]">github.com/jack-at-alice</p>
                   </div>
                 </motion.a>
               </div>
