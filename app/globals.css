@@ -279,11 +279,13 @@
   display: flex;
   gap: 2rem;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 2rem 0;
+  padding-top: 5rem;
+  padding-bottom: 2rem;
+  /* Left/right padding handled by Tailwind classes in component */
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -346,11 +348,6 @@
 
   .text-section-title {
     font-size: clamp(1.75rem, 8vw, 2.5rem);
-  }
-
-  .horizontal-scroll {
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 }
 

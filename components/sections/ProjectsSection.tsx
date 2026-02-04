@@ -8,6 +8,22 @@ import type { Project } from '@/lib/types';
 const projects: Project[] = [
   {
     id: 1,
+    title: 'Eyepromise',
+    description:
+      'E-commerce platform for a science-backed eye health company offering supplements and topical products. Features product catalog, subscription options, and educational content for consumers seeking clinically-proven eye care solutions.',
+    technologies: ['Shopify', 'Liquid', 'JavaScript', 'Theme Development', 'Custom Apps'],
+    link: 'https://eyepromise.com/',
+  },
+  {
+    id: 2,
+    title: 'CareDx',
+    description:
+      'Corporate website for a leading transplant healthcare company providing diagnostics, pharmacy services, and digital health platforms. Built with modern web technologies to serve both healthcare professionals and transplant patients.',
+    technologies: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'CMS'],
+    link: 'https://www.caredx.com/',
+  },
+  {
+    id: 3,
     title: 'Drive Stories',
     description:
       'Mobile-first React Native application with CarPlay/Android Auto integration. Features seamless hands-free audio streaming with offline caching and full media-browser integration. Integrated OpenAI-driven backend services for dynamic content generation, boosting personalization and user engagement.',
@@ -28,7 +44,7 @@ const projects: Project[] = [
     },
   },
   {
-    id: 2,
+    id: 4,
     title: 'BrdSrc',
     description:
       'Full-stack surfboard marketplace enabling users to buy and sell surfboards with seamless user experience. Features secure OAuth authentication, comprehensive user profiles, and robust data management. Built with modern web technologies for optimal performance and scalability.',
@@ -45,7 +61,7 @@ const projects: Project[] = [
     link: 'https://www.brdsrc.com',
   },
   {
-    id: 3,
+    id: 5,
     title: 'Northern Trust Platform',
     description:
       'Full-stack financial platform with comprehensive component library. Built 45+ reusable React components with Java backend integration and AEM CMS. Collaborated directly with client teams to streamline deployment workflows.',
@@ -61,7 +77,7 @@ const projects: Project[] = [
     link: 'https://www.northerntrust.com/united-states/what-we-do/wealth-management',
   },
   {
-    id: 4,
+    id: 6,
     title: 'Vanguard Renewables Site',
     description:
       'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
@@ -77,7 +93,7 @@ const projects: Project[] = [
     link: 'https://www.vanguardrenewables.com/',
   },
   {
-    id: 5,
+    id: 7,
     title: 'Edenspiekermann Marketing Site',
     description:
       'Agency portfolio and marketing website with cutting-edge performance optimization. Achieved sub-second global TTFB with zero runtime errors and enhanced user engagement through advanced animations.',
@@ -85,7 +101,7 @@ const projects: Project[] = [
     link: 'https://espi-website-2024.netlify.app/',
   },
   {
-    id: 6,
+    id: 8,
     title: 'Selby Lane',
     description:
       'Secure financial services client dashboard with robust authentication system. Features JWT-based login, encrypted data transmission, and comprehensive client portfolio management tools designed for financial advisors and their clients.',
@@ -101,7 +117,7 @@ const projects: Project[] = [
     link: 'https://selbylane.com/portal',
   },
   {
-    id: 7,
+    id: 9,
     title: 'Gwins NFT',
     description:
       'High-performance NFT minting website for exclusive 1-of-1 digital collectibles on Solana blockchain. Implemented seamless wallet integration and optimized minting process that enabled 100 unique NFTs to sell out within minutes of launch.',
@@ -137,13 +153,11 @@ export function ProjectsSection() {
       {/* Horizontal scroll container */}
       <div
         ref={containerRef}
-        className="horizontal-scroll pl-4 md:pl-8 lg:pl-[calc((100vw-1280px)/2+2rem)]"
+        className="horizontal-scroll items-stretch px-4 md:px-8 lg:px-[calc((100vw-1280px)/2+2rem)] scroll-px-4 md:scroll-px-8 lg:scroll-px-[calc((100vw-1280px)/2+2rem)]"
       >
         {projects.map((project, index) => (
           <ProjectCard key={project.id} project={project} index={index} />
         ))}
-        {/* Spacer for scroll end */}
-        <div className="w-8 md:w-16 flex-shrink-0" />
       </div>
 
       {/* Scroll progress indicator */}
