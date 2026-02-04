@@ -385,3 +385,78 @@
   border-color: var(--text-primary);
   background: var(--bg-tertiary);
 }
+
+/* ============================================
+   HERO AURORA & PARTICLE ANIMATIONS
+   ============================================ */
+
+@keyframes aurora-drift-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(10%, 5%) scale(1.1);
+  }
+  50% {
+    transform: translate(-5%, 10%) scale(0.95);
+  }
+  75% {
+    transform: translate(-10%, -5%) scale(1.05);
+  }
+}
+
+@keyframes aurora-drift-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-8%, 8%) scale(1.08);
+  }
+  66% {
+    transform: translate(6%, -6%) scale(0.92);
+  }
+}
+
+@keyframes aurora-drift-3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(12%, -8%) scale(1.05);
+  }
+  40% {
+    transform: translate(-6%, 12%) scale(0.98);
+  }
+  60% {
+    transform: translate(-12%, -4%) scale(1.02);
+  }
+  80% {
+    transform: translate(8%, 6%) scale(0.95);
+  }
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.aurora-blob {
+  will-change: transform;
+  filter: blur(80px);
+}
+
+.particle {
+  will-change: transform;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .particle {
+    animation: none !important;
+  }
+}
