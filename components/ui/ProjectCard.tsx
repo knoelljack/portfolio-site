@@ -24,7 +24,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
 
   return (
     <motion.div
-      className="scroll-card w-[400px] md:w-[500px] relative"
+      className="scroll-card w-[400px] md:w-[500px] relative h-full"
       initial={{ opacity: 0, y: 60 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -34,7 +34,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       <span className="project-number font-display">{projectNumber}</span>
 
       {/* Browser mockup card */}
-      <div className="relative z-10 bg-white rounded-2xl shadow-lg overflow-hidden border border-[var(--glass-border)]">
+      <div className="relative z-10 bg-white rounded-2xl shadow-lg overflow-hidden border border-[var(--glass-border)] h-full flex flex-col">
         {/* Browser chrome */}
         <div className="browser-chrome">
           <div className="flex gap-2">
@@ -62,7 +62,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         </motion.div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-grow">
           <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 font-display">
             {project.title}
           </h3>
@@ -71,7 +71,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </p>
 
           {/* Tech tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-2 mb-4 min-h-[4.5rem] content-start">
             {project.technologies.slice(0, 5).map((tech) => (
               <span key={tech} className="tech-tag">
                 {tech}
@@ -83,7 +83,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mt-auto pt-2">
             {project.comingSoon ? (
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-sm font-medium">
                 Coming Soon

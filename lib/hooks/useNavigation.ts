@@ -56,7 +56,22 @@ export function useNavigation(navItems: NavItem[]) {
       }
     });
 
-    return () => observer.disconnect();
+    // Handle edge case: activate last section when scrolled to bottom
+    const lastSectionId = navItems[navItems.length - 1]?.id;
+    const handleScroll = () => {
+      const scrolledToBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
+      if (scrolledToBottom && lastSectionId) {
+        setActiveSection(lastSectionId);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [navItems]);
 
   return {
