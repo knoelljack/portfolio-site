@@ -444,7 +444,42 @@
 
 @media (prefers-reduced-motion: reduce) {
   .aurora-blob,
-  .particle {
+  .particle,
+  .star-glow {
     animation: none !important;
   }
+}
+
+/* ============================================
+   CONSTELLATION MAP ANIMATIONS
+   ============================================ */
+
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes nebula-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(5%, 3%) scale(1.05);
+  }
+  50% {
+    transform: translate(-3%, 5%) scale(0.98);
+  }
+  75% {
+    transform: translate(-5%, -3%) scale(1.02);
+  }
+}
+
+.star-glow {
+  will-change: transform, opacity, filter;
 }
