@@ -71,9 +71,12 @@ export function MagneticButton({ href, children, className }: MagneticButtonProp
     };
   }, [isMobile, x, y]);
 
+  const isHashLink = href.startsWith('#');
+  const LinkComponent = isHashLink ? 'a' : Link;
+
   return (
     <motion.div style={{ x: springX, y: springY }}>
-      <Link
+      <LinkComponent
         ref={ref}
         href={href}
         className={cn(
@@ -101,7 +104,7 @@ export function MagneticButton({ href, children, className }: MagneticButtonProp
             />
           </svg>
         </motion.span>
-      </Link>
+      </LinkComponent>
     </motion.div>
   );
 }

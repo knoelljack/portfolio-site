@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Particle {
   id: number;
@@ -29,7 +29,12 @@ function generateParticles(count: number): Particle[] {
 
 export function ParticleField() {
   const [isMobile, setIsMobile] = useState(false);
-  const particles = useMemo(() => generateParticles(20), []);
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  // Generate particles only on client to avoid hydration mismatch
+  useEffect(() => {
+    setParticles(generateParticles(20));
+  }, []);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
