@@ -318,18 +318,6 @@
    UTILITY CLASSES
    ============================================ */
 
-.project-number {
-  font-size: clamp(6rem, 15vw, 12rem);
-  font-weight: 800;
-  color: var(--bg-tertiary);
-  position: absolute;
-  right: -1rem;
-  top: -2rem;
-  line-height: 1;
-  z-index: 0;
-  user-select: none;
-}
-
 /* Noise texture overlay */
 .noise-overlay {
   position: fixed;

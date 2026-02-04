@@ -20,7 +20,6 @@ const gradientColors = [
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
   const gradientClass = gradientColors[index % gradientColors.length];
-  const projectNumber = String(index + 1).padStart(2, '0');
 
   return (
     <motion.div
@@ -30,9 +29,6 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       transition={{ duration: 0.6, delay: index * 0.1 }}
       viewport={{ once: true, margin: '-100px' }}
     >
-      {/* Project number watermark */}
-      <span className="project-number font-display">{projectNumber}</span>
-
       {/* Browser mockup card */}
       <div className="relative z-10 bg-white rounded-2xl shadow-lg overflow-hidden border border-[var(--glass-border)] h-full flex flex-col">
         {/* Browser chrome */}
