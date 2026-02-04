@@ -1,23 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TechCloud } from '@/components/ui/TechCloud';
+import { ConstellationMap, TECHNOLOGIES, CONNECTIONS } from '@/components/ui/ConstellationMap';
 import { RevealText } from '@/components/ui/RevealText';
-
-const technologies = [
-  'React',
-  'Next.js',
-  'TypeScript',
-  'Node.js',
-  'React Native',
-  'GraphQL',
-  'Java',
-  'MongoDB',
-  'Tailwind CSS',
-  'Framer Motion',
-  'Shopify',
-  'Solana',
-];
 
 const expertiseAreas = [
   {
@@ -77,28 +62,21 @@ export function AboutSection() {
             </p>
           </div>
 
-          {/* Right side - Tech cloud */}
+          {/* Right side - Constellation map */}
           <div className="hidden lg:block">
-            <TechCloud technologies={technologies} />
+            <ConstellationMap
+              technologies={TECHNOLOGIES}
+              connections={CONNECTIONS}
+            />
           </div>
         </div>
 
-        {/* Mobile tech grid */}
+        {/* Mobile constellation map */}
         <div className="lg:hidden mb-16">
-          <div className="grid grid-cols-3 gap-3">
-            {technologies.map((tech, idx) => (
-              <motion.div
-                key={tech}
-                className="tech-tag text-center"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: idx * 0.05 }}
-                viewport={{ once: true }}
-              >
-                {tech}
-              </motion.div>
-            ))}
-          </div>
+          <ConstellationMap
+            technologies={TECHNOLOGIES}
+            connections={CONNECTIONS}
+          />
         </div>
 
         {/* Expertise cards - 2x2 grid */}
