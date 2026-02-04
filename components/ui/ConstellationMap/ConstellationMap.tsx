@@ -73,19 +73,9 @@ export function ConstellationMap({
     setHoveredId(id);
   }, []);
 
-  // Handle click/tap
-  const handleClick = useCallback((id: string) => {
+  // Handle click/tap - toggles selection
+  const handleSelect = useCallback((id: string) => {
     setSelectedId((prev) => (prev === id ? null : id));
-  }, []);
-
-  // Handle mobile select
-  const handleMobileSelect = useCallback((id: string) => {
-    setSelectedId((prev) => (prev === id ? null : id));
-  }, []);
-
-  // Close mobile panel
-  const handleClosePanel = useCallback(() => {
-    setSelectedId(null);
   }, []);
 
   // Click outside to deselect (desktop)
@@ -118,7 +108,7 @@ export function ConstellationMap({
             technologies={technologies}
             connections={connections}
             selectedId={selectedId}
-            onSelect={handleMobileSelect}
+            onSelect={handleSelect}
           />
         )}
 
@@ -137,7 +127,7 @@ export function ConstellationMap({
 
             {/* Stars */}
             {isInView && (
-              <div className="absolute inset-0" style={{ zIndex: 10 }}>
+              <div className="absolute inset-0 z-10">
                 {technologies.map((tech, index) => (
                   <Star
                     key={tech.id}
@@ -148,7 +138,7 @@ export function ConstellationMap({
                     isSelected={selectedId === tech.id}
                     proximity={proximities.get(tech.id) || 0}
                     onHover={handleHover}
-                    onClick={handleClick}
+                    onClick={handleSelect}
                   />
                 ))}
               </div>

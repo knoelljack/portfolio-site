@@ -2,8 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMemo } from 'react';
-import { Technology, Connection, AccentColor } from './types';
-import { PROFICIENCY_DESCRIPTIONS, ENTRANCE_EASING } from './constants';
+import { Technology, Connection, ProficiencyLevel } from './types';
+import {
+  PROFICIENCY_DESCRIPTIONS,
+  ENTRANCE_EASING,
+  ACCENT_COLORS,
+  PROFICIENCY_BARS,
+} from './constants';
 
 interface MobileSkillsGridProps {
   technologies: Technology[];
@@ -12,17 +17,11 @@ interface MobileSkillsGridProps {
   onSelect: (id: string) => void;
 }
 
-const accentColors: Record<AccentColor, string> = {
-  coral: 'var(--accent-coral)',
-  violet: 'var(--accent-violet)',
-  tangerine: 'var(--accent-tangerine)',
-};
-
-const proficiencyBars: Record<string, number> = {
-  Expert: 4,
-  Advanced: 3,
+const PROFICIENCY_ORDER: Record<ProficiencyLevel, number> = {
+  Expert: 0,
+  Advanced: 1,
   Intermediate: 2,
-  Familiar: 1,
+  Familiar: 3,
 };
 
 export function MobileSkillsGrid({
@@ -33,9 +32,8 @@ export function MobileSkillsGrid({
 }: MobileSkillsGridProps) {
   // Sort technologies by proficiency level (Expert first) then by name
   const sortedTechnologies = useMemo(() => {
-    const proficiencyOrder = { Expert: 0, Advanced: 1, Intermediate: 2, Familiar: 3 };
     return [...technologies].sort((a, b) => {
-      const profDiff = proficiencyOrder[a.proficiency] - proficiencyOrder[b.proficiency];
+      const profDiff = PROFICIENCY_ORDER[a.proficiency] - PROFICIENCY_ORDER[b.proficiency];
       if (profDiff !== 0) return profDiff;
       return a.name.localeCompare(b.name);
     });
@@ -68,8 +66,8 @@ export function MobileSkillsGrid({
       <div className="grid grid-cols-2 gap-2 flex-1 content-start">
         {sortedTechnologies.map((tech, index) => {
           const isSelected = selectedId === tech.id;
-          const color = accentColors[tech.accent];
-          const bars = proficiencyBars[tech.proficiency];
+          const color = ACCENT_COLORS[tech.accent];
+          const bars = PROFICIENCY_BARS[tech.proficiency];
 
           return (
             <motion.button
@@ -152,8 +150,7 @@ export function MobileSkillsGrid({
       <AnimatePresence>
         {selectedTech && (
           <motion.div
-            className="absolute bottom-3 left-3 right-3 glass-card rounded-xl p-3"
-            style={{ zIndex: 20 }}
+            className="absolute bottom-3 left-3 right-3 z-20 glass-card rounded-xl p-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
@@ -168,13 +165,13 @@ export function MobileSkillsGrid({
                 <div
                   className="w-2.5 h-2.5 rounded-full"
                   style={{
-                    backgroundColor: accentColors[selectedTech.accent],
-                    boxShadow: `0 0 8px ${accentColors[selectedTech.accent]}`,
+                    backgroundColor: ACCENT_COLORS[selectedTech.accent],
+                    boxShadow: `0 0 8px ${ACCENT_COLORS[selectedTech.accent]}`,
                   }}
                 />
                 <h3
                   className="font-semibold text-sm"
-                  style={{ color: accentColors[selectedTech.accent] }}
+                  style={{ color: ACCENT_COLORS[selectedTech.accent] }}
                 >
                   {selectedTech.name}
                 </h3>

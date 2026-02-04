@@ -5,11 +5,6 @@ import { useEffect, useState, useCallback, RefObject } from 'react';
 import { Technology } from '../types';
 import { SPRING_CONFIG } from '../constants';
 
-interface MousePosition {
-  x: number;
-  y: number;
-}
-
 interface ProximityResult {
   mouseX: ReturnType<typeof useSpring>;
   mouseY: ReturnType<typeof useSpring>;
