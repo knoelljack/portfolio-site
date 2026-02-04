@@ -1,7 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { AuroraBackground } from '@/components/ui/AuroraBackground';
+import { ParticleField } from '@/components/ui/ParticleField';
+import { MagneticButton } from '@/components/ui/MagneticButton';
 
 interface AnimatedCharacterProps {
   char: string;
@@ -18,13 +20,13 @@ function AnimatedCharacter({ char, index }: AnimatedCharacterProps) {
         type: 'spring',
         stiffness: 380,
         damping: 30,
-        delay: index * 0.04,
+        delay: index * 0.08,
       }}
     >
       {char === ' ' ? '\u00A0' : char}
     </motion.span>
   );
-};
+}
 
 interface AnimatedTextProps {
   text: string;
@@ -42,76 +44,45 @@ function AnimatedText({ text, className = '' }: AnimatedTextProps) {
 }
 
 export function HeroHeader() {
-  const greeting = "Hi, I'm";
   const name = 'Jack';
-  const tagline = 'Full-Stack Developer & Creative Technologist';
 
   return (
     <section className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
-      <div className="container px-4 md:px-8 mx-auto relative z-10">
-        <div className="max-w-5xl">
-          {/* Main heading */}
-          <h1 className="text-display font-display mb-6">
-            <div className="text-[var(--text-primary)]">
-              <AnimatedText text={greeting} />
-            </div>
-            <div className="text-gradient-animated">
-              <AnimatedText text={name} className="block" />
-            </div>
-          </h1>
+      {/* Background layers */}
+      <AuroraBackground />
+      <ParticleField />
 
-          {/* Tagline */}
-          <motion.p
-            className="text-xl md:text-2xl text-[var(--text-secondary)] mb-10 max-w-2xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            {tagline}
-          </motion.p>
+      {/* Bottom fade gradient */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-72 pointer-events-none z-[5]"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(250,250,250,0.5) 40%, var(--background) 80%)',
+        }}
+      />
 
-          {/* CTA Buttons */}
-          <motion.div
-            className="flex flex-wrap gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-          >
-            <Link
-              href="#projects"
-              className="btn-gradient px-8 py-4 rounded-xl text-lg font-semibold inline-flex items-center gap-2"
-            >
-              View Projects
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </Link>
-            <Link
-              href="#contact"
-              className="btn-outline px-8 py-4 rounded-xl text-lg font-semibold inline-flex items-center gap-2"
-            >
-              Get in Touch
-            </Link>
-          </motion.div>
-        </div>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <h1 className="text-display font-display mb-10">
+          <span className="text-gradient-animated">
+            <AnimatedText text={name} />
+          </span>
+        </h1>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <MagneticButton href="#projects">View Projects</MagneticButton>
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1.5 }}
+        transition={{ duration: 0.8, delay: 1 }}
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
