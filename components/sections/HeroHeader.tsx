@@ -13,7 +13,7 @@ interface AnimatedCharacterProps {
 function AnimatedCharacter({ char, index }: AnimatedCharacterProps) {
   return (
     <motion.span
-      className="inline-block"
+      className="inline-block text-gradient-animated"
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{
@@ -63,9 +63,7 @@ export function HeroHeader() {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center">
         <h1 className="text-display font-display mb-10">
-          <span className="text-gradient-animated">
-            <AnimatedText text={name} />
-          </span>
+          <AnimatedText text={name} />
         </h1>
 
         <motion.div
