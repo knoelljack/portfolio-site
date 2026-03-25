@@ -12,7 +12,7 @@ export function Footer() {
         </div>
         <div className="flex gap-10">
           <a
-            href="https://github.com/knoelljack"
+            href="https://github.com/jack-at-alice"
             target="_blank"
             rel="noopener noreferrer"
             className="font-display text-[9px] uppercase tracking-[0.3em] hover:text-white transition-colors"
