@@ -11,15 +11,13 @@ export interface NavItem {
 export function useNavigation(navItems: NavItem[]) {
   const [activeSection, setActiveSection] = useState<string>('home');
 
-  // Immediate scroll to section
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      window.scrollTo(0, element.offsetTop);
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
-  // Handle navigation click
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault();
@@ -29,7 +27,6 @@ export function useNavigation(navItems: NavItem[]) {
     [scrollToSection]
   );
 
-  // Track active section based on scroll position
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -47,16 +44,14 @@ export function useNavigation(navItems: NavItem[]) {
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-    // Observe all sections
-    const sections = ['home', ...navItems.map((item) => item.id)];
-    sections.forEach((sectionId) => {
+    const sectionIds = new Set(navItems.map((item) => item.id));
+    sectionIds.forEach((sectionId) => {
       const element = document.getElementById(sectionId);
       if (element) {
         observer.observe(element);
       }
     });
 
-    // Handle edge case: activate last section when scrolled to bottom
     const lastSectionId = navItems[navItems.length - 1]?.id;
     const handleScroll = () => {
       const scrolledToBottom =

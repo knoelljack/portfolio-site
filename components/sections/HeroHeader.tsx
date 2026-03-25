@@ -1,102 +1,100 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AuroraBackground } from '@/components/ui/AuroraBackground';
-import { ParticleField } from '@/components/ui/ParticleField';
-import { MagneticButton } from '@/components/ui/MagneticButton';
-
-interface AnimatedCharacterProps {
-  char: string;
-  index: number;
-}
-
-function AnimatedCharacter({ char, index }: AnimatedCharacterProps) {
-  return (
-    <motion.span
-      className="inline-block text-gradient-animated"
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{
-        type: 'spring',
-        stiffness: 380,
-        damping: 30,
-        delay: index * 0.08,
-      }}
-    >
-      {char === ' ' ? '\u00A0' : char}
-    </motion.span>
-  );
-}
-
-interface AnimatedTextProps {
-  text: string;
-  className?: string;
-}
-
-function AnimatedText({ text, className = '' }: AnimatedTextProps) {
-  return (
-    <span className={className}>
-      {text.split('').map((char, index) => (
-        <AnimatedCharacter key={index} char={char} index={index} />
-      ))}
-    </span>
-  );
-}
 
 export function HeroHeader() {
-  const name = 'Jack';
-
   return (
-    <section className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
-      {/* Background layers */}
-      <AuroraBackground />
-      <ParticleField />
+    <section className="relative min-h-[90vh] flex flex-col justify-center px-8 max-w-[1440px] mx-auto pt-24 pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+        {/* Left: Headline */}
+        <div className="md:col-span-8 relative z-10">
+          {/* Eyebrow */}
+          <div className="overflow-hidden mb-4">
+            <motion.span
+              className="font-display text-[10px] uppercase tracking-[0.4em] block"
+              style={{ color: '#919191' }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              transition={{ duration: 1, ease: [0.33, 1, 0.68, 1], delay: 0.4 }}
+            >
+              Full-Stack Developer
+            </motion.span>
+          </div>
 
-      {/* Bottom fade gradient */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-72 pointer-events-none z-[5]"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(250,250,250,0.5) 40%, var(--background) 80%)',
-        }}
-      />
+          {/* Main headline */}
+          <h1 className="text-display font-display mb-10 text-white">
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+              >
+                JACK
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.65 }}
+              >
+                KNOELL
+              </motion.span>
+            </span>
+            {/* Stroke-only line — fills white on hover */}
+            <motion.span
+              className="block text-transparent hover:text-white transition-colors duration-700 cursor-default select-none"
+              style={{ WebkitTextStroke: '1px rgba(255,255,255,0.25)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.9 }}
+            >
+              DEV.
+            </motion.span>
+          </h1>
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <h1 className="text-display font-display mb-10">
-          <AnimatedText text={name} />
-        </h1>
-
+        {/* Right: Description + CTA */}
         <motion.div
+          className="md:col-span-4 pb-4 md:pb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8, delay: 1.05 }}
         >
-          <MagneticButton href="#projects">View Projects</MagneticButton>
+          <p
+            className="max-w-xs text-sm leading-relaxed border-l-2 border-white/50 pl-6"
+            style={{ color: '#c6c6c6' }}
+          >
+            Crafting high-performance web experiences through the lens of architectural precision
+            and technical craft.
+          </p>
+          <div className="mt-8 pl-6">
+            <a
+              href="#projects"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="btn-primary px-8 py-3"
+            >
+              View Work
+            </a>
+          </div>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1 }}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="text-sm text-[var(--text-muted)]">Scroll</span>
-          <div className="w-6 h-10 border-2 border-[var(--text-muted)] rounded-full flex justify-center pt-2">
-            <motion.div
-              className="w-1.5 h-1.5 bg-[var(--text-muted)] rounded-full"
-              animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </div>
-        </motion.div>
-      </motion.div>
+      {/* Hero background — subtle grid pattern */}
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-4/5 -z-10"
+        aria-hidden="true"
+        style={{
+          opacity: 0.15,
+          background:
+            'repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 80px)',
+        }}
+      />
     </section>
   );
 }

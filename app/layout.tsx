@@ -1,13 +1,12 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, Inter } from 'next/font/google';
+import { Manrope, Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar } from '@/components/sections/Navbar';
-import { GradientMesh } from '@/components/ui/GradientMesh';
 
-const spaceGrotesk = Space_Grotesk({
+const manrope = Manrope({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-space-grotesk',
+  weight: ['400', '700', '800'],
+  variable: '--font-manrope',
   display: 'swap',
 });
 
@@ -37,12 +36,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
       <body className={inter.className}>
-        <GradientMesh />
+        {/* Architectural grid overlay */}
+        <div
+          className="fixed inset-0 pointer-events-none z-[100] grid-overlay"
+          style={{ opacity: 0.03 }}
+          aria-hidden="true"
+        />
         <div className="noise-overlay" />
         <Navbar />
-        <main>{children}</main>
+        <main className="relative z-10">{children}</main>
       </body>
     </html>
   );
