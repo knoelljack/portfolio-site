@@ -1,7 +1,7 @@
 'use client';
 
+import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import type { Project } from '@/lib/types';
 
@@ -10,7 +10,7 @@ const projects: Project[] = [
     id: 1,
     title: 'Eyepromise',
     description:
-      'E-commerce platform for a science-backed eye health company offering supplements and topical products. Features product catalog, subscription options, and educational content for consumers seeking clinically-proven eye care solutions.',
+      'E-commerce platform for a science-backed eye health company offering supplements and topical products.',
     technologies: ['Shopify', 'Liquid', 'JavaScript', 'Theme Development', 'Custom Apps'],
     link: 'https://eyepromise.com/',
   },
@@ -18,7 +18,7 @@ const projects: Project[] = [
     id: 2,
     title: 'CareDx',
     description:
-      'Corporate website for a leading transplant healthcare company providing diagnostics, pharmacy services, and digital health platforms. Built with modern web technologies to serve both healthcare professionals and transplant patients.',
+      'Corporate website for a leading transplant healthcare company providing diagnostics, pharmacy services, and digital health platforms.',
     technologies: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'CMS'],
     link: 'https://www.caredx.com/',
   },
@@ -26,60 +26,40 @@ const projects: Project[] = [
     id: 3,
     title: 'Drive Stories',
     description:
-      'Mobile-first React Native application with CarPlay/Android Auto integration. Features seamless hands-free audio streaming with offline caching and full media-browser integration. Integrated OpenAI-driven backend services for dynamic content generation, boosting personalization and user engagement.',
+      'Mobile-first React Native application with CarPlay/Android Auto integration and OpenAI-driven backend services.',
     technologies: [
       'React Native',
       'TypeScript',
       'CarPlay API',
       'Android Auto',
-      'Audio Session Management',
       'OpenAI API',
-      'Cloudflare R2',
-      'Cloudflare KV',
       'Cloudflare Workers',
     ],
-    comingSoon: false,
     appStoreLinks: {
       apple: 'https://apps.apple.com/us/app/drive-stories/id6743227880',
     },
   },
   {
     id: 4,
-    title: 'Northern Trust Platform',
+    title: 'Northern Trust',
     description:
-      'Full-stack financial platform with comprehensive component library. Built 45+ reusable React components with Java backend integration and AEM CMS. Collaborated directly with client teams to streamline deployment workflows.',
-    technologies: [
-      'React',
-      'Java',
-      'AEM CMS',
-      'TypeScript',
-      'Component Library',
-      'Unit Tests',
-      'CI/CD',
-    ],
+      'Full-stack financial platform with 45+ reusable React components, Java backend integration, and AEM CMS.',
+    technologies: ['React', 'Java', 'AEM CMS', 'TypeScript', 'Component Library', 'CI/CD'],
     link: 'https://www.northerntrust.com/united-states/what-we-do/wealth-management',
   },
   {
     id: 5,
-    title: 'Vanguard Renewables Site',
+    title: 'Vanguard Renewables',
     description:
-      'High-performance corporate website achieving perfect 100% Lighthouse score. Features modular CMS-driven sections with optimized GraphQL data layer to eliminate over-fetching and ensure fast load times.',
-    technologies: [
-      'Next.js',
-      'TypeScript',
-      'SCSS',
-      'GraphQL',
-      'Performance Optimization',
-      'DatoCMS',
-      'Framer Motion',
-    ],
+      'High-performance corporate website achieving perfect 100% Lighthouse score with optimized GraphQL data layer.',
+    technologies: ['Next.js', 'TypeScript', 'SCSS', 'GraphQL', 'DatoCMS', 'Framer Motion'],
     link: 'https://www.vanguardrenewables.com/',
   },
   {
     id: 6,
-    title: 'Edenspiekermann Marketing Site',
+    title: 'Edenspiekermann',
     description:
-      'Agency portfolio and marketing website with cutting-edge performance optimization. Achieved sub-second global TTFB with zero runtime errors and enhanced user engagement through advanced animations.',
+      'Agency portfolio and marketing website with sub-second global TTFB and zero runtime errors.',
     technologies: ['Next.js', 'React', 'DatoCMS', 'GraphQL Codegen', 'Framer Motion'],
     link: 'https://espi-website-2024.netlify.app/',
   },
@@ -87,93 +67,169 @@ const projects: Project[] = [
     id: 7,
     title: 'Selby Lane',
     description:
-      'Secure financial services client dashboard with robust authentication system. Features JWT-based login, encrypted data transmission, and comprehensive client portfolio management tools designed for financial advisors and their clients.',
-    technologies: [
-      'React',
-      'TypeScript',
-      'JWT Authentication',
-      'Node.js',
-      'Mailchimp',
-      'Security',
-      'AWS Lambda',
-    ],
+      'Secure financial services client dashboard with JWT authentication and comprehensive portfolio management.',
+    technologies: ['React', 'TypeScript', 'JWT Authentication', 'Node.js', 'AWS Lambda'],
     link: 'https://selbylane.com/portal',
   },
   {
     id: 8,
     title: 'BrdSrc',
     description:
-      'Full-stack surfboard marketplace enabling users to buy and sell surfboards with seamless user experience. Features secure OAuth authentication, comprehensive user profiles, and robust data management. Built with modern web technologies for optimal performance and scalability.',
-    technologies: [
-      'Next.js',
-      'TypeScript',
-      'Prisma',
-      'OAuth',
-      'Google Analytics',
-      'Database Management',
-      'Authentication',
-      'E-commerce',
-    ],
+      'Full-stack surfboard marketplace with OAuth authentication and comprehensive user profiles.',
+    technologies: ['Next.js', 'TypeScript', 'Prisma', 'OAuth', 'Google Analytics'],
     link: 'https://www.brdsrc.com',
   },
   {
     id: 9,
     title: 'Gwins NFT',
     description:
-      'High-performance NFT minting website for exclusive 1-of-1 digital collectibles on Solana blockchain. Implemented seamless wallet integration and optimized minting process that enabled 100 unique NFTs to sell out within minutes of launch.',
-    technologies: ['React', 'TypeScript', 'Solana', 'Web3.js', 'Phantom Wallet', 'NFT Metadata'],
+      'High-performance NFT minting site on Solana blockchain — 100 unique NFTs sold out within minutes of launch.',
+    technologies: ['React', 'TypeScript', 'Solana', 'Web3.js', 'Phantom Wallet'],
     link: 'https://magiceden.us/marketplace/gwins',
   },
 ];
 
-export function ProjectsSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollXProgress } = useScroll({ container: containerRef });
-  const progressWidth = useTransform(scrollXProgress, [0, 1], ['0%', '100%']);
-
+function MobileProjects() {
   return (
-    <div className="w-full">
-      <div className="container px-4 md:px-8 mx-auto mb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+    <section className="bg-black monolith-border py-16">
+      <div className="px-6 max-w-[1440px] mx-auto">
+        <h2 className="text-section-title font-display uppercase tracking-tighter text-white mb-2">
+          Selected Works
+        </h2>
+        <p
+          className="font-display text-[10px] uppercase tracking-[0.5em] mb-12"
+          style={{ color: '#919191' }}
         >
-          <h2 className="text-section-title font-display text-[var(--text-primary)] mb-4">
-            Featured Projects
-          </h2>
-          <p className="text-lg text-[var(--text-secondary)] max-w-2xl">
-            A selection of my recent work spanning web applications, mobile development, and
-            creative technology solutions.
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Horizontal scroll container */}
-      <div
-        ref={containerRef}
-        className="horizontal-scroll items-stretch px-4 md:px-8 lg:px-[calc((100vw-1280px)/2+2rem)] scroll-px-4 md:scroll-px-8 lg:scroll-px-[calc((100vw-1280px)/2+2rem)]"
-      >
-        {projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
-        ))}
-      </div>
-
-      {/* Scroll progress indicator */}
-      <div className="container px-4 md:px-8 mx-auto mt-8">
-        <div className="max-w-xs mx-auto">
-          <div className="h-1 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-[var(--accent-coral)] to-[var(--accent-violet)] rounded-full"
-              style={{ width: progressWidth }}
-            />
-          </div>
-          <p className="text-center text-sm text-[var(--text-muted)] mt-2">
-            Scroll to explore projects
-          </p>
+          Systems &amp; Interfaces
+        </p>
+        <div className="space-y-12 border-t border-white/10 pt-8">
+          {projects.map((project, index) => (
+            <a
+              key={project.id}
+              href={project.appStoreLinks?.apple || project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block group"
+            >
+              <div className="flex justify-between items-start border-l border-white/20 pl-4">
+                <div>
+                  <h3 className="font-display font-extrabold tracking-tighter text-white text-xl mb-1">
+                    {project.title.toUpperCase()}
+                  </h3>
+                  <p
+                    className="font-display text-[10px] uppercase tracking-widest"
+                    style={{ color: '#919191' }}
+                  >
+                    {project.technologies.slice(0, 2).join(' / ')}
+                  </p>
+                </div>
+                <span
+                  className="font-display font-extrabold tabular-nums text-2xl"
+                  style={{ color: 'rgba(255,255,255,0.1)' }}
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </div>
+            </a>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
+  );
+}
+
+export function ProjectsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const scrollDistanceRef = useRef(0);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    checkMobile();
+    const mq = window.matchMedia('(max-width: 768px)');
+    mq.addEventListener('change', checkMobile);
+    return () => mq.removeEventListener('change', checkMobile);
+  }, []);
+
+  // Measure carousel scroll distance and set outer section height
+  useEffect(() => {
+    if (isMobile) return;
+    const measure = () => {
+      if (contentRef.current && sectionRef.current) {
+        const dist = Math.max(0, contentRef.current.scrollWidth - window.innerWidth);
+        scrollDistanceRef.current = dist;
+        sectionRef.current.style.height = `${window.innerHeight + dist}px`;
+      }
+    };
+    requestAnimationFrame(() => requestAnimationFrame(measure));
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [isMobile]);
+
+  // Scroll-linked horizontal motion via sticky + useScroll
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  });
+
+  const x = useTransform(scrollYProgress, (v) => -v * scrollDistanceRef.current);
+  const bgTextX = useTransform(scrollYProgress, (v) => `${v * scrollDistanceRef.current * 0.1}px`);
+
+  if (isMobile) return <MobileProjects />;
+
+  return (
+    <section ref={sectionRef}>
+      <div className="sticky top-0 h-screen overflow-hidden bg-black monolith-border">
+        {/* Ghost watermark text */}
+        <motion.h2
+          className="absolute font-display font-extrabold uppercase leading-none pointer-events-none select-none text-white"
+          style={{
+            fontSize: '15vw',
+            opacity: 0.03,
+            top: '50%',
+            left: 0,
+            transform: 'translateY(-50%)',
+            x: bgTextX,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          ARCHITECTURE
+        </motion.h2>
+
+        {/* Section title — top left */}
+        <div className="absolute top-0 left-0 right-0 px-8 pt-24 z-10 pointer-events-none">
+          <div className="max-w-[1440px] mx-auto">
+            <h2 className="text-section-title font-display uppercase tracking-tighter text-white">
+              03 // Selected Works
+            </h2>
+            <p
+              className="font-display text-[10px] uppercase tracking-[0.5em] mt-2"
+              style={{ color: '#919191' }}
+            >
+              Systems &amp; Interfaces
+            </p>
+          </div>
+        </div>
+
+        {/* Horizontally scrolling content */}
+        <div className="absolute inset-0 flex items-center">
+          <motion.div
+            ref={contentRef}
+            className="flex items-center gap-10"
+            style={{
+              x,
+              paddingLeft: 'max(2rem, calc((100vw - 1440px) / 2 + 2rem))',
+              paddingRight: '8rem',
+            }}
+          >
+            {projects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </section>
   );
 }
