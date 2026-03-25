@@ -228,6 +228,23 @@ export function AboutSection() {
           </div>
         </div>
 
+        {/* Components shipped */}
+        <div
+          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
+          style={{ background: 'var(--surface-container)' }}
+        >
+          <span className="text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
+            <CountUp to={100} />
+            <span style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+          </span>
+          <span
+            className="font-display text-[9px] uppercase tracking-[0.3em]"
+            style={{ color: '#919191' }}
+          >
+            Components Shipped
+          </span>
+        </div>
+
         {/* Fortune 500 clients */}
         <div
           className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
@@ -244,22 +261,6 @@ export function AboutSection() {
             style={{ color: '#919191' }}
           >
             Enterprise Clients
-          </span>
-        </div>
-
-        {/* Availability */}
-        <div
-          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <span className="text-4xl mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            ✦
-          </span>
-          <span
-            className="font-display text-[9px] uppercase tracking-[0.3em]"
-            style={{ color: '#919191' }}
-          >
-            Available for Work
           </span>
         </div>
 
@@ -280,20 +281,19 @@ export function AboutSection() {
           </span>
         </div>
 
-        {/* Projects shipped */}
+        {/* Availability */}
         <div
           className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
           style={{ background: 'var(--surface-container)' }}
         >
-          <span className="text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
-            <CountUp to={100} />
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+          <span className="text-4xl mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            ✦
           </span>
           <span
             className="font-display text-[9px] uppercase tracking-[0.3em]"
             style={{ color: '#919191' }}
           >
-            Components Shipped
+            Available for Work
           </span>
         </div>
       </div>

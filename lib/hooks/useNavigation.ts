@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 export interface NavItem {
   id: string;
@@ -10,6 +10,7 @@ export interface NavItem {
 
 export function useNavigation(navItems: NavItem[]) {
   const [activeSection, setActiveSection] = useState<string>('home');
+  const intersectingRef = useRef<Set<string>>(new Set());
 
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -28,29 +29,43 @@ export function useNavigation(navItems: NavItem[]) {
   );
 
   useEffect(() => {
+    const sectionOrder = navItems.map((item) => item.id);
+
     const observerOptions = {
       root: null,
-      rootMargin: '-10% 0px -70% 0px',
-      threshold: 0.1,
+      rootMargin: '-10% 0px -60% 0px',
+      threshold: 0,
     };
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
+      for (const entry of entries) {
         if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
+          intersectingRef.current.add(entry.target.id);
+        } else {
+          intersectingRef.current.delete(entry.target.id);
         }
-      });
+      }
+
+      // Pick the furthest-down intersecting section
+      let active = '';
+      for (const id of sectionOrder) {
+        if (intersectingRef.current.has(id)) {
+          active = id;
+        }
+      }
+      if (active) {
+        setActiveSection(active);
+      }
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-    const sectionIds = new Set(navItems.map((item) => item.id));
-    sectionIds.forEach((sectionId) => {
+    for (const sectionId of sectionOrder) {
       const element = document.getElementById(sectionId);
       if (element) {
         observer.observe(element);
       }
-    });
+    }
 
     const lastSectionId = navItems[navItems.length - 1]?.id;
     const handleScroll = () => {
@@ -66,6 +81,7 @@ export function useNavigation(navItems: NavItem[]) {
     return () => {
       observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
+      intersectingRef.current.clear();
     };
   }, [navItems]);
 
