@@ -87,14 +87,6 @@ const projects: Project[] = [
     link: 'https://www.brdsrc.com',
     logo: '/logos/brdsrc-logo.svg',
   },
-  {
-    id: 9,
-    title: 'Gwins NFT',
-    description:
-      'High-performance NFT minting site on Solana blockchain — 100 unique NFTs sold out within minutes of launch.',
-    technologies: ['React', 'TypeScript', 'Solana', 'Web3.js', 'Phantom Wallet'],
-    link: 'https://magiceden.us/marketplace/gwins',
-  },
 ];
 
 function MobileProjects() {
