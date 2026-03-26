@@ -6,6 +6,7 @@ export interface Project {
   link?: string;
   github?: string;
   comingSoon?: boolean;
+  logo?: string;
   appStoreLinks?: {
     apple?: string;
     google?: string;

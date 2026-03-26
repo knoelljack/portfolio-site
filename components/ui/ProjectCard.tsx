@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import type { Project } from '@/lib/types';
 
@@ -37,14 +38,25 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           className="aspect-[16/10] overflow-hidden mb-8 border border-white/5 relative"
           style={{ background: bg }}
         >
-          {/* Ghost first letter */}
+          {/* Logo or ghost first letter */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <span
-              className="font-display font-extrabold leading-none tracking-tighter select-none"
-              style={{ fontSize: '10rem', color: 'rgba(255,255,255,0.04)' }}
-            >
-              {project.title.charAt(0)}
-            </span>
+            {project.logo ? (
+              <Image
+                src={project.logo}
+                alt={project.title}
+                width={200}
+                height={80}
+                className="object-contain opacity-70 group-hover:opacity-90 transition-opacity duration-700"
+                style={{ filter: 'none' }}
+              />
+            ) : (
+              <span
+                className="font-display font-extrabold leading-none tracking-tighter select-none"
+                style={{ fontSize: '10rem', color: 'rgba(255,255,255,0.04)' }}
+              >
+                {project.title.charAt(0)}
+              </span>
+            )}
           </div>
           {/* Hover brightening overlay */}
           <div className="absolute inset-0 bg-white/0 group-hover:bg-white/[0.04] transition-all duration-700" />

@@ -13,6 +13,7 @@ const projects: Project[] = [
       'E-commerce platform for a science-backed eye health company offering supplements and topical products.',
     technologies: ['Shopify', 'Liquid', 'JavaScript', 'Theme Development', 'Custom Apps'],
     link: 'https://eyepromise.com/',
+    logo: '/logos/eyepromise-logo.svg',
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const projects: Project[] = [
       'Corporate website for a leading transplant healthcare company providing diagnostics, pharmacy services, and digital health platforms.',
     technologies: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'CMS'],
     link: 'https://www.caredx.com/',
+    logo: '/logos/caredx-logo.svg',
   },
   {
     id: 3,
@@ -38,6 +40,7 @@ const projects: Project[] = [
     appStoreLinks: {
       apple: 'https://apps.apple.com/us/app/drive-stories/id6743227880',
     },
+    logo: '/logos/drive-stories-logo.svg',
   },
   {
     id: 4,
@@ -46,6 +49,7 @@ const projects: Project[] = [
       'Full-stack financial platform with 45+ reusable React components, Java backend integration, and AEM CMS.',
     technologies: ['React', 'Java', 'AEM CMS', 'TypeScript', 'Component Library', 'CI/CD'],
     link: 'https://www.northerntrust.com/united-states/what-we-do/wealth-management',
+    logo: '/logos/northern-trust-logo.svg',
   },
   {
     id: 5,
@@ -54,6 +58,7 @@ const projects: Project[] = [
       'High-performance corporate website achieving perfect 100% Lighthouse score with optimized GraphQL data layer.',
     technologies: ['Next.js', 'TypeScript', 'SCSS', 'GraphQL', 'DatoCMS', 'Framer Motion'],
     link: 'https://www.vanguardrenewables.com/',
+    logo: '/logos/vanguard-renewables-logo.svg',
   },
   {
     id: 6,
@@ -61,7 +66,8 @@ const projects: Project[] = [
     description:
       'Agency portfolio and marketing website with sub-second global TTFB and zero runtime errors.',
     technologies: ['Next.js', 'React', 'DatoCMS', 'GraphQL Codegen', 'Framer Motion'],
-    link: 'https://espi-website-2024.netlify.app/',
+    link: 'https://www.edenspiekermann.com/',
+    logo: '/logos/edenspiekermann-logo.svg',
   },
   {
     id: 7,
@@ -69,7 +75,8 @@ const projects: Project[] = [
     description:
       'Secure financial services client dashboard with JWT authentication and comprehensive portfolio management.',
     technologies: ['React', 'TypeScript', 'JWT Authentication', 'Node.js', 'AWS Lambda'],
-    link: 'https://selbylane.com/portal',
+    link: 'https://selbylane.com/',
+    logo: '/logos/selby-lane-logo.svg',
   },
   {
     id: 8,
@@ -78,6 +85,7 @@ const projects: Project[] = [
       'Full-stack surfboard marketplace with OAuth authentication and comprehensive user profiles.',
     technologies: ['Next.js', 'TypeScript', 'Prisma', 'OAuth', 'Google Analytics'],
     link: 'https://www.brdsrc.com',
+    logo: '/logos/brdsrc-logo.svg',
   },
   {
     id: 9,
