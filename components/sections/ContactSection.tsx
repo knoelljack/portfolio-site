@@ -8,29 +8,30 @@ export function ContactSection() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSubmitting(true);
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const entries = Object.fromEntries(
-      Array.from(formData.entries()).map(([k, v]) => [k, v.toString()])
-    );
+    setIsError(false);
+    const formData = new FormData(e.currentTarget);
     try {
-      const res = await fetch('/', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(entries).toString(),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          message: formData.get('message'),
+        }),
       });
       if (res.ok) {
         setIsSubmitted(true);
-        form.reset();
       } else {
-        throw new Error('Failed');
+        setIsError(true);
       }
     } catch {
-      alert('There was an error sending your message. Please try again.');
+      setIsError(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -38,7 +39,6 @@ export function ContactSection() {
 
   return (
     <section className="bg-white px-8 py-32 text-center text-black relative overflow-hidden">
-      {/* Dot grid overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -102,7 +102,6 @@ export function ContactSection() {
           </a>
         </motion.div>
 
-        {/* Collapsible email form */}
         {isFormOpen && (
           <motion.div
             className="mt-20 max-w-xl mx-auto text-left"
@@ -111,7 +110,7 @@ export function ContactSection() {
             transition={{ duration: 0.4 }}
           >
             {isSubmitted ? (
-              <div className="flex flex-col items-start gap-4">
+              <div className="flex flex-col items-center gap-4 text-center">
                 <div className="w-12 h-12 border-2 border-black flex items-center justify-center">
                   <Check className="w-5 h-5" />
                 </div>
@@ -132,19 +131,7 @@ export function ContactSection() {
                 </button>
               </div>
             ) : (
-              <form
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                data-netlify-honeypot="bot-field"
-                onSubmit={handleSubmit}
-                className="space-y-5"
-              >
-                <input type="hidden" name="form-name" value="contact" />
-                <div className="hidden">
-                  <input name="bot-field" />
-                </div>
-
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block font-display text-[10px] font-bold uppercase tracking-widest mb-2 opacity-50">
                     Name *
@@ -183,6 +170,12 @@ export function ContactSection() {
                     placeholder="Tell me about your project..."
                   />
                 </div>
+
+                {isError && (
+                  <p className="text-sm text-red-600">
+                    There was an error sending your message. Please try again.
+                  </p>
+                )}
 
                 <button
                   type="submit"
