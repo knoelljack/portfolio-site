@@ -30,6 +30,9 @@ export function useNavigation(navItems: NavItem[]) {
 
   useEffect(() => {
     const sectionOrder = navItems.map((item) => item.id);
+    // Captured once so the cleanup clears the same Set this effect observed
+    // into, not whatever `.current` happens to point at by teardown.
+    const intersecting = intersectingRef.current;
 
     const observerOptions = {
       root: null,
@@ -40,16 +43,16 @@ export function useNavigation(navItems: NavItem[]) {
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          intersectingRef.current.add(entry.target.id);
+          intersecting.add(entry.target.id);
         } else {
-          intersectingRef.current.delete(entry.target.id);
+          intersecting.delete(entry.target.id);
         }
       }
 
       // Pick the furthest-down intersecting section
       let active = '';
       for (const id of sectionOrder) {
-        if (intersectingRef.current.has(id)) {
+        if (intersecting.has(id)) {
           active = id;
         }
       }
@@ -81,7 +84,7 @@ export function useNavigation(navItems: NavItem[]) {
     return () => {
       observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
-      intersectingRef.current.clear();
+      intersecting.clear();
     };
   }, [navItems]);
 
