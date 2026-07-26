@@ -46,28 +46,25 @@ function ScrollRevealWord({
   );
 }
 
-export function RevealText(props: RevealTextProps) {
+function ScrollReveal({ children, className, scrollProgress }: RevealTextScrollProps) {
+  const words = children.split(' ');
+  return (
+    <span className={className}>
+      {words.map((word, index) => (
+        <ScrollRevealWord
+          key={index}
+          word={word}
+          index={index}
+          total={words.length}
+          scrollProgress={scrollProgress}
+        />
+      ))}
+    </span>
+  );
+}
+
+function ViewportReveal({ children, className = '', delay = 0 }: RevealTextViewportProps) {
   const ref = useRef(null);
-
-  if (props.mode === 'scroll') {
-    const words = props.children.split(' ');
-    return (
-      <span className={props.className}>
-        {words.map((word, index) => (
-          <ScrollRevealWord
-            key={index}
-            word={word}
-            index={index}
-            total={words.length}
-            scrollProgress={props.scrollProgress}
-          />
-        ))}
-      </span>
-    );
-  }
-
-  // Viewport mode (default)
-  const { children, className = '', delay = 0 } = props as RevealTextViewportProps;
   const isInView = useInView(ref, { once: true, margin: '-10%' });
   const words = children.split(' ');
 
@@ -92,4 +89,14 @@ export function RevealText(props: RevealTextProps) {
       ))}
     </span>
   );
+}
+
+/**
+ * The two modes are separate components rather than branches in one, because
+ * the viewport mode calls `useInView` and the scroll mode returns before it.
+ * Switching `mode` on a mounted instance would change the hook order and
+ * throw \u2014 splitting them means each renders a fresh component instead.
+ */
+export function RevealText(props: RevealTextProps) {
+  return props.mode === 'scroll' ? <ScrollReveal {...props} /> : <ViewportReveal {...props} />;
 }

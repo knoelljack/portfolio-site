@@ -71,230 +71,169 @@ function useRevealObserver(containerRef: React.RefObject<HTMLElement | null>) {
 
     boxes.forEach((box) => observer.observe(box));
     return () => observer.disconnect();
-  }, []);
+  }, [containerRef]);
 }
+
+const STACK = [
+  { label: 'React', Icon: SiReact },
+  { label: 'Next.js', Icon: SiNextdotjs },
+  { label: 'TypeScript', Icon: SiTypescript },
+  { label: 'Node.js', Icon: SiNodedotjs },
+  { label: 'Tailwind', Icon: SiTailwindcss },
+  { label: 'GraphQL', Icon: SiGraphql },
+  { label: 'MongoDB', Icon: SiMongodb },
+  { label: 'Shopify', Icon: SiShopify },
+  { label: 'Vercel', Icon: SiVercel },
+  { label: 'Cloudflare', Icon: SiCloudflare },
+  { label: 'Java', Icon: FaJava },
+  { label: 'Solana', Icon: SiSolana },
+];
 
 export function AboutSection() {
   const containerRef = useRef<HTMLElement>(null);
   useRevealObserver(containerRef);
 
   return (
-    <section
-      ref={containerRef}
-      className="px-8 py-16 max-w-[1440px] mx-auto border-t border-white/5"
-    >
+    <section ref={containerRef} className="px-6 md:px-10 py-20 md:py-28 max-w-[1440px] mx-auto">
       <div className="bento-grid">
-        {/* 01 // CRAFT — large 2×2 philosophy card */}
-        <div
-          className="col-span-4 md:col-span-2 row-span-2 p-12 flex flex-col justify-between border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
+        {/* Craft — the philosophy panel */}
+        <div className="col-span-2 row-span-2 glass glass-sheen glass-interactive reveal-box p-8 md:p-11 flex flex-col justify-between">
           <div>
-            <h2 className="font-display text-4xl font-bold tracking-tighter mb-8 italic text-white">
-              01 // CRAFT
-            </h2>
-            <p className="text-lg leading-relaxed font-light" style={{ color: '#c6c6c6' }}>
+            <h2 className="text-card-title mb-6 text-white">Craft</h2>
+            <p
+              className="text-[17px] leading-relaxed font-light"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               I believe every interface is a built structure. Every pixel serves a purpose, and
               every interaction should feel grounded in logic. My work bridges the gap between
               precise engineering and human-centric design.
             </p>
           </div>
-          <div className="mt-12 pt-12 border-t border-white/5 space-y-4">
+          <div className="mt-10 pt-8 border-t border-white/10 space-y-4">
             <div className="flex items-center justify-between">
-              <span
-                className="font-display text-[10px] uppercase tracking-widest"
-                style={{ color: '#919191' }}
-              >
-                Experience
-              </span>
+              <span className="label">Experience</span>
               <span className="font-display font-bold tabular-nums text-white">4+ Years</span>
             </div>
             <div className="flex items-center justify-between">
-              <span
-                className="font-display text-[10px] uppercase tracking-widest"
-                style={{ color: '#919191' }}
-              >
-                Location
-              </span>
-              <span className="font-display font-bold italic text-white">Irvine, CA</span>
+              <span className="label">Location</span>
+              <span className="font-display font-bold text-white">Irvine, CA</span>
             </div>
           </div>
         </div>
 
-        {/* View Latest Works — white CTA card */}
-        <div
-          className="col-span-4 md:col-span-2 row-span-1 p-12 flex flex-col justify-between text-black group cursor-pointer overflow-hidden relative reveal-box"
-          style={{ background: '#ffffff' }}
+        {/* View latest works — the bright pane that replaces the old flat white card */}
+        <button
+          type="button"
+          className="col-span-2 glass glass-sheen glass-bright glass-interactive reveal-box p-8 md:p-9 flex flex-col justify-between gap-10 text-left group cursor-pointer overflow-hidden"
           onClick={() =>
             document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })
           }
         >
-          <div className="flex justify-between items-start relative z-10">
-            <ArrowUpRight className="w-12 h-12 transition-transform duration-500 group-hover:translate-x-2 group-hover:-translate-y-2" />
-            <span className="font-display text-[10px] uppercase tracking-widest opacity-50">
-              Featured Gallery
-            </span>
+          <div className="flex justify-between items-start w-full">
+            <ArrowUpRight className="w-10 h-10 text-white transition-transform duration-500 group-hover:translate-x-1.5 group-hover:-translate-y-1.5" />
+            <span className="label">Featured Gallery</span>
           </div>
-          <div className="relative z-10">
-            <h3 className="font-display text-3xl font-extrabold leading-none uppercase tracking-tighter">
-              View Latest
+          <div className="w-full">
+            <h3 className="text-card-title text-white">
+              View latest
               <br />
-              Works
+              works
             </h3>
-            <p className="text-[10px] mt-4 uppercase tracking-[0.3em] font-bold opacity-50">
-              Scroll to explore
-            </p>
+            <p className="label mt-3">Scroll to explore</p>
           </div>
-          {/* Ghost watermark */}
-          <div className="absolute -right-6 -bottom-6 font-display font-extrabold text-[8rem] leading-none opacity-[0.04] select-none pointer-events-none">
-            WORK
-          </div>
-        </div>
-
-        {/* Technical Foundation — 4×3 logo grid */}
-        <div
-          className="col-span-4 md:col-span-2 row-span-1 p-10 flex flex-col justify-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <h3
-            className="font-display text-[10px] uppercase tracking-[0.3em] mb-6"
-            style={{ color: '#919191' }}
+          <span
+            className="absolute -right-5 -bottom-6 font-display font-extrabold text-[5.5rem] leading-none select-none pointer-events-none text-white/[0.05]"
+            aria-hidden="true"
           >
-            Technical Foundation
-          </h3>
-          <div className="grid grid-cols-4 gap-3">
-            {[
-              { label: 'React', Icon: SiReact },
-              { label: 'Next.js', Icon: SiNextdotjs },
-              { label: 'TypeScript', Icon: SiTypescript },
-              { label: 'Node.js', Icon: SiNodedotjs },
-              { label: 'Tailwind', Icon: SiTailwindcss },
-              { label: 'GraphQL', Icon: SiGraphql },
-              { label: 'MongoDB', Icon: SiMongodb },
-              { label: 'Shopify', Icon: SiShopify },
-              { label: 'Vercel', Icon: SiVercel },
-              { label: 'Cloudflare', Icon: SiCloudflare },
-              { label: 'Java', Icon: FaJava },
-              { label: 'Solana', Icon: SiSolana },
-            ].map(({ label, Icon }) => (
+            Work
+          </span>
+        </button>
+
+        {/* Technical foundation */}
+        <div className="col-span-2 glass glass-sheen reveal-box p-7 md:p-9 flex flex-col justify-center">
+          <h3 className="label mb-5">Technical Foundation</h3>
+          <div className="grid grid-cols-6 gap-2.5">
+            {STACK.map(({ label, Icon }) => (
               <div
                 key={label}
-                className="h-14 flex items-center justify-center group hover:bg-white transition-all duration-300 cursor-crosshair border border-white/5"
-                style={{ background: 'var(--surface-elevated)' }}
+                className="h-12 rounded-[14px] flex items-center justify-center transition-all duration-300 hover:scale-105"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+                }}
                 title={label}
               >
                 <Icon
-                  size={22}
-                  className="group-hover:text-black transition-colors"
-                  style={{ color: '#c6c6c6' }}
+                  size={20}
+                  className="transition-colors duration-300 hover:text-white"
+                  style={{ color: 'var(--text-secondary)' }}
                 />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Stats title card */}
-        <div className="col-span-4 md:col-span-2 row-span-2 p-12 flex flex-col justify-between overflow-hidden relative border border-white/5 reveal-box bg-black">
-          {/* Diagonal stripe pattern */}
-          <div
-            className="absolute inset-0 pointer-events-none"
+        {/* By the numbers — the darker counterpoint panel */}
+        <div className="col-span-2 row-span-2 glass glass-sheen reveal-box p-8 md:p-11 flex flex-col justify-between overflow-hidden">
+          <span className="label">By the numbers</span>
+          <div>
+            <h3 className="text-card-title text-white mb-5">
+              Impact &amp;
+              <br />
+              scale.
+            </h3>
+            <p
+              className="text-[15px] font-light leading-relaxed"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Shipped across fintech, health, automotive, and Web3 — from enterprise platforms to
+              consumer apps used daily.
+            </p>
+          </div>
+          {/* A soft bloom in the corner so this panel catches more of the field */}
+          <span
+            className="absolute -right-16 -top-16 w-56 h-56 rounded-full pointer-events-none"
+            aria-hidden="true"
             style={{
-              backgroundImage:
-                'repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 24px)',
-              opacity: 0.6,
+              background:
+                'radial-gradient(circle, rgb(var(--aura-violet) / 0.3) 0%, transparent 68%)',
             }}
           />
-          <div className="relative z-10 flex flex-col justify-between h-full">
-            <span
-              className="font-display text-[10px] uppercase tracking-[0.4em]"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
-            >
-              02 // By The Numbers
-            </span>
-            <div>
-              <h3 className="font-display text-4xl font-extrabold tracking-tighter text-white italic leading-tight mb-6">
-                Impact &amp;
-                <br />
-                Scale.
-              </h3>
-              <p
-                className="text-sm font-light leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
-                Shipped across fintech, health, automotive, and Web3 — from enterprise platforms to
-                consumer apps used daily.
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Components shipped */}
-        <div
-          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <span className="text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
+        {/* Stats */}
+        <div className="col-span-1 glass glass-sheen reveal-box p-6 flex flex-col items-center justify-center text-center">
+          <span className="text-4xl md:text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
             <CountUp to={100} />
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+            <span className="text-white/25">+</span>
           </span>
-          <span
-            className="font-display text-[9px] uppercase tracking-[0.3em]"
-            style={{ color: '#919191' }}
-          >
-            Components Shipped
-          </span>
+          <span className="label text-center leading-snug">Components Shipped</span>
         </div>
 
-        {/* Fortune 500 clients */}
-        <div
-          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <span className="text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
+        <div className="col-span-1 glass glass-sheen reveal-box p-6 flex flex-col items-center justify-center text-center">
+          <span className="text-4xl md:text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
             F
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <span className="text-white/25">
               <CountUp to={500} />
             </span>
           </span>
-          <span
-            className="font-display text-[9px] uppercase tracking-[0.3em]"
-            style={{ color: '#919191' }}
-          >
-            Enterprise Clients
-          </span>
+          <span className="label text-center leading-snug">Enterprise Clients</span>
         </div>
 
-        {/* Technologies */}
-        <div
-          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <span className="text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
+        <div className="col-span-1 glass glass-sheen reveal-box p-6 flex flex-col items-center justify-center text-center">
+          <span className="text-4xl md:text-5xl font-extrabold font-display mb-2 tabular-nums text-white">
             <CountUp to={20} />
-            <span style={{ color: 'rgba(255,255,255,0.2)' }}>+</span>
+            <span className="text-white/25">+</span>
           </span>
-          <span
-            className="font-display text-[9px] uppercase tracking-[0.3em]"
-            style={{ color: '#919191' }}
-          >
-            Technologies
-          </span>
+          <span className="label text-center leading-snug">Technologies</span>
         </div>
 
-        {/* Availability */}
-        <div
-          className="col-span-2 md:col-span-1 p-8 flex flex-col items-center justify-center text-center border border-white/5 reveal-box"
-          style={{ background: 'var(--surface-container)' }}
-        >
-          <span className="text-4xl mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>
-            ✦
+        <div className="col-span-1 glass glass-sheen reveal-box p-6 flex flex-col items-center justify-center text-center">
+          <span className="relative flex h-2.5 w-2.5 mb-4">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-300" />
           </span>
-          <span
-            className="font-display text-[9px] uppercase tracking-[0.3em]"
-            style={{ color: '#919191' }}
-          >
-            Available for Work
-          </span>
+          <span className="label text-center leading-snug">Available for Work</span>
         </div>
       </div>
     </section>
