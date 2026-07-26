@@ -18,20 +18,38 @@ const navItems: NavItem[] = [
 const desktopNavItems = navItems.filter((item) => item.id !== 'home');
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [onLight, setOnLight] = useState(false);
   const { activeSection, handleNavClick } = useNavigation(navItems);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 300);
+    const timer = setTimeout(() => setIsVisible(true), 250);
     return () => clearTimeout(timer);
   }, []);
 
+  // The pill floats over both the dark sections and the light contact
+  // inversion, so it has to flip material when contact passes underneath it.
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 100);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const el = document.getElementById('contact');
+      if (!el) return;
+      const { top, bottom } = el.getBoundingClientRect();
+      setOnLight(top <= 92 && bottom >= 16);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    check();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
   }, []);
 
   const handleMobileNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -43,54 +61,71 @@ export function Navbar() {
     <AnimatePresence>
       {isVisible && (
         <motion.header
-          className={`fixed top-0 left-0 right-0 z-50 nav-dark ${scrolled ? 'scrolled' : ''}`}
-          initial={{ opacity: 0, y: -16 }}
+          className="fixed top-4 left-0 right-0 z-50 px-4 md:px-6"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+          transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
         >
-          <div className="max-w-[1440px] mx-auto px-8 py-6 flex items-center justify-between">
-            {/* Wordmark */}
+          {/* A detached pill rather than a full-width bar — it lets the
+              ambient field read continuously behind and above it. */}
+          <div
+            className={`glass glass-sheen max-w-[1200px] mx-auto !rounded-full pl-6 pr-2 py-2 flex items-center justify-between transition-[background,box-shadow] duration-500 ${
+              onLight ? 'nav-on-light' : ''
+            }`}
+          >
             <Link
               href="/#home"
               onClick={(e) => handleNavClick(e, '/#home')}
-              className="font-display font-extrabold text-xl tracking-tighter text-white hover:opacity-60 transition-opacity"
+              className="relative z-10 font-display font-extrabold text-lg tracking-tight hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--text-primary)' }}
             >
               JK.
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-10">
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-1 relative z-10">
               {desktopNavItems.map((item) => (
                 <Link
                   key={item.id}
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="font-display font-bold text-[11px] uppercase tracking-[0.25em] transition-colors pb-0.5"
+                  className="relative px-4 py-2 rounded-full font-display text-[13px] font-medium transition-colors duration-300"
                   style={{
-                    color: activeSection === item.id ? '#ffffff' : '#888888',
-                    borderBottom:
-                      activeSection === item.id ? '1px solid #ffffff' : '1px solid transparent',
+                    color: activeSection === item.id ? 'var(--text-primary)' : 'var(--text-muted)',
                   }}
                 >
-                  {item.label}
+                  {activeSection === item.id && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: 'var(--nav-active-bg)',
+                        boxShadow: 'inset 0 1px 0 var(--nav-active-rim)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative">{item.label}</span>
                 </Link>
               ))}
               <a
                 href="/resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary px-7 py-2.5"
+                className={`btn ml-3 px-6 py-2.5 text-[13px] ${
+                  onLight ? 'btn-solid-dark' : 'btn-solid'
+                }`}
               >
                 Resume
               </a>
             </nav>
 
             {/* Mobile hamburger */}
-            <div className="md:hidden">
+            <div className="md:hidden relative z-10">
               <Button
                 variant="ghost"
                 size="icon"
-                className="!h-10 !w-10 !p-0 border-0 hover:bg-white/10 rounded-none"
+                className="!h-10 !w-10 !p-0 border-0 hover:bg-white/10 rounded-full"
                 onClick={() => setIsOpen(!isOpen)}
               >
                 <HamburgerButton isOpen={isOpen} />
@@ -99,20 +134,24 @@ export function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Sheet */}
+          {/* Mobile sheet */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetContent
               side="right"
-              className="w-screen max-w-[100vw] h-screen p-0 border-0 overflow-hidden rounded-none"
-              style={{ background: '#0a0a0a' }}
+              className="w-screen max-w-[100vw] h-screen p-0 border-0 overflow-hidden"
+              style={{
+                background: 'rgba(6,6,8,0.72)',
+                WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+                backdropFilter: 'blur(40px) saturate(180%)',
+              }}
             >
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
 
-              <div className="fixed right-6 top-5 z-50">
+              <div className="fixed right-7 top-7 z-50">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="!h-10 !w-10 !p-0 border-0 hover:bg-white/10 rounded-none"
+                  className="!h-10 !w-10 !p-0 border-0 hover:bg-white/10 rounded-full"
                   onClick={() => setIsOpen(false)}
                 >
                   <HamburgerButton isOpen={true} />
@@ -120,35 +159,37 @@ export function Navbar() {
                 </Button>
               </div>
 
-              <nav className="flex flex-col p-8 pt-24 gap-1">
+              <nav className="flex flex-col p-8 pt-28 gap-2">
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.href}
-                    initial={{ opacity: 0, x: 40 }}
+                    initial={{ opacity: 0, x: 32 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.06, duration: 0.4 }}
+                    transition={{ delay: index * 0.06, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
                   >
                     <Link
                       href={item.href}
                       onClick={(e) => handleMobileNavClick(e, item.href)}
-                      className="block font-display font-extrabold text-5xl tracking-tighter py-3 transition-colors"
-                      style={{ color: activeSection === item.id ? '#ffffff' : '#444444' }}
+                      className="block font-display font-extrabold text-5xl tracking-tight py-3 transition-colors"
+                      style={{
+                        color: activeSection === item.id ? '#ffffff' : 'var(--text-faint)',
+                      }}
                     >
                       {item.label}
                     </Link>
                   </motion.div>
                 ))}
                 <motion.div
-                  className="mt-8"
+                  className="mt-10"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.35 }}
                 >
                   <a
                     href="/resume.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-primary px-10 py-4"
+                    className="btn btn-solid px-10 py-4"
                   >
                     Resume
                   </a>

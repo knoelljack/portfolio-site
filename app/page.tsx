@@ -5,8 +5,10 @@ import { ContactSection } from '@/components/sections/ContactSection';
 import { Footer } from '@/components/sections/Footer';
 
 export default function Home() {
+  // No background colour here — the ambient field lives behind everything and
+  // an opaque wrapper would hide the only thing the glass has to refract.
   return (
-    <div className="bg-[var(--background)]">
+    <div>
       <section id="home">
         <HeroHeader />
       </section>

@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
 import { ProjectCard } from '@/components/ui/ProjectCard';
 import type { Project } from '@/lib/types';
 
@@ -89,45 +90,40 @@ const projects: Project[] = [
   },
 ];
 
+function SectionHeading() {
+  return (
+    <>
+      <h2 className="text-section-title text-white">Selected works</h2>
+      <p className="label mt-3">Systems &amp; Interfaces</p>
+    </>
+  );
+}
+
 function MobileProjects() {
   return (
-    <section className="bg-black monolith-border py-16">
+    <section className="py-20">
       <div className="px-6 max-w-[1440px] mx-auto">
-        <h2 className="text-section-title font-display uppercase tracking-tighter text-white mb-2">
-          Selected Works
-        </h2>
-        <p
-          className="font-display text-[10px] uppercase tracking-[0.5em] mb-12"
-          style={{ color: '#919191' }}
-        >
-          Systems &amp; Interfaces
-        </p>
-        <div className="space-y-12 border-t border-white/10 pt-8">
-          {projects.map((project, index) => (
+        <SectionHeading />
+        <div className="mt-10 space-y-3">
+          {projects.map((project) => (
             <a
               key={project.id}
               href={project.appStoreLinks?.apple || project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="block group"
+              className="glass glass-sheen glass-interactive block p-5 group"
             >
-              <div className="flex justify-between items-start border-l border-white/20 pl-4">
-                <div>
-                  <h3 className="font-display font-extrabold tracking-tighter text-white text-xl mb-1">
-                    {project.title.toUpperCase()}
+              <div className="flex justify-between items-center gap-4">
+                <div className="min-w-0">
+                  <h3 className="font-display font-bold tracking-tight text-white text-lg truncate">
+                    {project.title}
                   </h3>
-                  <p
-                    className="font-display text-[10px] uppercase tracking-widest"
-                    style={{ color: '#919191' }}
-                  >
-                    {project.technologies.slice(0, 2).join(' / ')}
+                  <p className="label mt-1 truncate">
+                    {project.technologies.slice(0, 2).join(' · ')}
                   </p>
                 </div>
-                <span
-                  className="font-display font-extrabold tabular-nums text-2xl"
-                  style={{ color: 'rgba(255,255,255,0.1)' }}
-                >
-                  {String(index + 1).padStart(2, '0')}
+                <span className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center bg-white/[0.07]">
+                  <ArrowUpRight className="w-4 h-4 text-white" />
                 </span>
               </div>
             </a>
@@ -181,35 +177,38 @@ export function ProjectsSection() {
 
   return (
     <section ref={sectionRef}>
-      <div className="sticky top-0 h-screen overflow-hidden bg-black monolith-border">
-        {/* Ghost watermark text */}
-        <motion.h2
-          className="absolute font-display font-extrabold uppercase leading-none pointer-events-none select-none text-white"
+      <div className="sticky top-0 h-screen overflow-hidden">
+        {/* A soft veil rather than flat black — it deepens the field so the
+            cards read as lit, without cutting the ambient off entirely. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(3,3,5,0.55) 0%, rgba(3,3,5,0.2) 45%, rgba(3,3,5,0.6) 100%)',
+          }}
+        />
+
+        {/* Ghost word — the glass cards refract it as they pass */}
+        <motion.span
+          className="absolute font-display font-extrabold leading-none pointer-events-none select-none text-white/[0.035]"
+          aria-hidden="true"
           style={{
             fontSize: '15vw',
-            opacity: 0.03,
             top: '50%',
             left: 0,
-            transform: 'translateY(-50%)',
+            translateY: '-50%',
             x: bgTextX,
             whiteSpace: 'nowrap',
           }}
         >
-          ARCHITECTURE
-        </motion.h2>
+          Architecture
+        </motion.span>
 
-        {/* Section title — top left */}
-        <div className="absolute top-0 left-0 right-0 px-8 pt-24 z-10 pointer-events-none">
+        {/* Section title */}
+        <div className="absolute top-0 left-0 right-0 px-6 md:px-10 pt-28 z-10 pointer-events-none">
           <div className="max-w-[1440px] mx-auto">
-            <h2 className="text-section-title font-display uppercase tracking-tighter text-white">
-              03 // Selected Works
-            </h2>
-            <p
-              className="font-display text-[10px] uppercase tracking-[0.5em] mt-2"
-              style={{ color: '#919191' }}
-            >
-              Systems &amp; Interfaces
-            </p>
+            <SectionHeading />
           </div>
         </div>
 
@@ -217,10 +216,10 @@ export function ProjectsSection() {
         <div className="absolute inset-0 flex items-center">
           <motion.div
             ref={contentRef}
-            className="flex items-center gap-10"
+            className="flex items-center gap-8"
             style={{
               x,
-              paddingLeft: 'max(2rem, calc((100vw - 1440px) / 2 + 2rem))',
+              paddingLeft: 'max(2.5rem, calc((100vw - 1440px) / 2 + 2.5rem))',
               paddingRight: '8rem',
             }}
           >
