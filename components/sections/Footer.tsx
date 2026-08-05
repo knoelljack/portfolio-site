@@ -1,5 +1,5 @@
 const ELSEWHERE = [
-  { label: 'GitHub', href: 'https://github.com/jack-at-alice' },
+  { label: 'GitHub', href: 'https://github.com/knoelljack' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jackknoell/' },
   { label: 'Resume', href: '/resume.pdf' },
 ];
