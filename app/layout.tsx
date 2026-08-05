@@ -1,48 +1,57 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Inter } from 'next/font/google';
+import { Instrument_Serif, Archivo, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { Navbar } from '@/components/sections/Navbar';
-import { AmbientField } from '@/components/ui/AmbientField';
+import { Nav } from '@/components/sections/Nav';
 
-const jakarta = Plus_Jakarta_Sans({
+const instrument = Instrument_Serif({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-jakarta',
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument',
   display: 'swap',
 });
 
-const inter = Inter({
+const archivo = Archivo({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-inter',
+  variable: '--font-archivo',
   display: 'swap',
 });
+
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
+
+const description =
+  'Frontend developer in Irvine, California. I build the interfaces brands are remembered by — for Northern Trust, CareDx, Vanguard Renewables and Edenspiekermann.';
 
 export const metadata: Metadata = {
-  title: 'Jack Knoell - Portfolio',
-  description: 'Full-Stack Developer & Creative Technologist',
+  metadataBase: new URL('https://jackknoell.dev'),
+  title: 'Jack Knoell — Frontend Developer',
+  description,
   openGraph: {
-    title: 'Jack Knoell - Portfolio',
-    description: 'Full-Stack Developer & Creative Technologist',
+    title: 'Jack Knoell — Frontend Developer',
+    description,
     url: 'https://jackknoell.dev',
-    siteName: 'Jack Knoell Portfolio',
+    siteName: 'Jack Knoell',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jack Knoell - Portfolio',
-    description: 'Full-Stack Developer & Creative Technologist',
+    title: 'Jack Knoell — Frontend Developer',
+    description,
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${inter.variable}`}>
-      <body className={inter.className}>
-        {/* The light source every glass surface on the page refracts. */}
-        <AmbientField />
-        <div className="noise-overlay" aria-hidden="true" />
-        <Navbar />
+    <html lang="en" className={`${instrument.variable} ${archivo.variable} ${jetbrains.variable}`}>
+      <body>
+        {/* Tinted by whichever project is in view. See WorkSection. */}
+        <div className="wash" aria-hidden="true" />
+        <Nav />
         <main className="relative z-10">{children}</main>
       </body>
     </html>
