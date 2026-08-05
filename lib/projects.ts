@@ -79,17 +79,6 @@ export const projects: Project[] = [
     link: 'https://selbylane.com/',
   },
   {
-    slug: 'brdsrc',
-    title: 'BrdSrc',
-    discipline: 'Marketplace',
-    summary:
-      'Full-stack surfboard marketplace with OAuth authentication and comprehensive user profiles.',
-    technologies: ['Next.js', 'Prisma', 'OAuth', 'TypeScript'],
-    accent: '15 85 99',
-    image: '/work/brdsrc.jpg',
-    link: 'https://www.brdsrc.com',
-  },
-  {
     slug: 'drive-stories',
     title: 'Drive Stories',
     discipline: 'iOS / CarPlay',

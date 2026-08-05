@@ -1,17 +1,9 @@
-import { projects } from '@/lib/projects';
-
 const LINES = [
   <>I build the interfaces</>,
   <>brands are</>,
   <>
     <em>remembered by.</em>
   </>,
-];
-
-const FACTS = [
-  ['Based', 'Irvine, California'],
-  ['Experience', '4+ years'],
-  ['Shipped', `${projects.length} products`],
 ];
 
 export function Hero() {
@@ -34,22 +26,8 @@ export function Hero() {
         ))}
       </h1>
 
-      <div
-        className="fade-up mt-12 md:mt-20 flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
-        style={{ animationDelay: '0.85s' }}
-      >
-        <dl className="flex flex-wrap gap-x-12 gap-y-6">
-          {FACTS.map(([label, value]) => (
-            <div key={label}>
-              <dt className="mono">{label}</dt>
-              <dd className="mt-2 text-[0.9375rem]" style={{ color: 'var(--ink-2)' }}>
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <a href="#work" className="btn btn-solid self-start md:self-auto">
+      <div className="fade-up mt-12 md:mt-16" style={{ animationDelay: '0.85s' }}>
+        <a href="#work" className="btn btn-solid">
           See the work
         </a>
       </div>
