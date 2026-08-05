@@ -1,14 +1,17 @@
 export interface Project {
-  id: number;
+  slug: string;
   title: string;
-  description: string;
+  /** What kind of product it is — sits above the title on the panel. */
+  discipline: string;
+  summary: string;
   technologies: string[];
-  link?: string;
-  github?: string;
-  comingSoon?: boolean;
-  logo?: string;
-  appStoreLinks?: {
-    apple?: string;
-    google?: string;
-  };
+  /** Brand colour as an `R G B` triple, for `rgb(var(--accent) / a)`. */
+  accent: string;
+  /** Deepened accent for solid fills, where the brand colour fails contrast. */
+  accentUi?: string;
+  /** Omitted when the project has no website to screenshot. */
+  image?: string;
+  link: string;
+  /** Overrides the default "Visit site" affordance label. */
+  linkLabel?: string;
 }

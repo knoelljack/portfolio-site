@@ -1,708 +1,507 @@
 @import 'tailwindcss';
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-jakarta);
-  --radius-sm: var(--r-sm);
-  --radius-md: var(--r-md);
-  --radius-lg: var(--r-lg);
-  --radius-xl: var(--r-xl);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-archivo);
+  --font-display: var(--font-instrument);
+  --font-mono: var(--font-jetbrains);
 }
 
+/* ============================================================
+   TOKENS
+
+   The site is a frame, not a picture. Every saturated colour on
+   the page belongs to a client brand and arrives through a work
+   panel — the chassis itself stays grey, black and white.
+   ============================================================ */
+
 :root {
-  /* ---- Radii — generous, iOS-material ---- */
-  --r-xs: 10px;
-  --r-sm: 14px;
-  --r-md: 20px;
-  --r-lg: 28px;
-  --r-xl: 36px;
-  --r-full: 999px;
+  /* Gallery grey, not white. Saturated panels read as *lit* against a
+     toned wall; against pure white they just read as loud. */
+  --paper: #e9e9e5;
+  --paper-lift: #f3f3f0;
+  --paper-deep: #dededa;
 
-  /* ---- Base field ----
-     Cooler and slightly deeper than flat black so the aura reads as light,
-     not as a stain. Everything above this is either glass or type. */
-  --background: #060608;
-  --background-deep: #030305;
-  --foreground: #f2f2f5;
+  --ink: #0e0e11;
+  --ink-2: #56565f;
+  /* 4.6:1 on --paper. The mono labels are 11px, so this is the lightest the
+     tertiary tone can go and still clear AA. */
+  --ink-3: #66666f;
+  --line: rgb(14 14 17 / 0.13);
+  --line-strong: rgb(14 14 17 / 0.28);
 
-  --text-primary: #f4f4f7;
-  --text-secondary: #b9b9c6;
-  --text-muted: #82829a;
-  --text-faint: #55556a;
+  /* The active project's brand colour. Set on <html> by the carousel and
+     read by the ambient wash — this is the one channel through which
+     client chroma reaches the chassis.
 
-  /* ---- Aura hues — the only chroma in the system ----
-     Never applied to type or UI. Only ever seen *through* glass. */
-  --aura-indigo: 99 91 255;
-  --aura-violet: 168 85 247;
-  --aura-teal: 45 212 191;
+     `--accent` is the true brand colour and is only ever used at low alpha.
+     `--accent-ui` is the contrast-safe variant, and is the only one allowed
+     to sit behind white text.
 
-  /* ---- Glass ---- */
-  --glass-blur: 28px;
-  --glass-saturate: 180%;
-  --glass-tint-hi: rgba(255, 255, 255, 0.1);
-  --glass-tint-lo: rgba(255, 255, 255, 0.022);
-  --glass-rim: rgba(255, 255, 255, 0.22);
-  --glass-rim-dim: rgba(255, 255, 255, 0.04);
-  --glass-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.85);
+     Off the carousel the accent falls back to a cool neutral: near-black in
+     the wash reads as smoke rather than light. */
+  --accent: 122 126 142;
+  --accent-ui: 14 14 17;
 
-  /* ---- Light glass (contact inversion) ---- */
-  --light-bg: #eceaf4;
-  --light-text: #16161d;
-  --light-text-muted: #5c5c72;
-  --light-tint-hi: rgba(255, 255, 255, 0.9);
-  --light-tint-lo: rgba(255, 255, 255, 0.45);
-  --light-rim: rgba(255, 255, 255, 0.95);
-  --light-shadow: 0 24px 60px -26px rgba(40, 34, 80, 0.35);
+  --shell: min(1440px, 100% - 3rem);
 
-  --ease-glass: cubic-bezier(0.32, 0.72, 0, 1);
-
-  /* Navbar active-item pill — overridden by .nav-on-light */
-  --nav-active-bg: rgba(255, 255, 255, 0.09);
-  --nav-active-rim: rgba(255, 255, 255, 0.18);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @layer base {
   * {
     box-sizing: border-box;
+    min-width: 0;
   }
 
   html {
-    overflow-x: clip;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background: var(--background);
-    color: var(--foreground);
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
     font-family: var(--font-sans);
-    overflow-x: clip;
+    font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
-  body[data-sheet-open] {
+  body[data-menu-open] {
     overflow: hidden;
   }
 
   ::selection {
-    background: rgb(var(--aura-violet) / 0.35);
+    background: rgb(var(--accent-ui));
     color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid rgb(var(--aura-indigo) / 0.9);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
-    border-radius: var(--r-xs);
+    border-radius: 2px;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
   }
 }
 
-/* ============================================
-   TYPOGRAPHY — soft reset
-   Sentence case, optical sizing, relaxed tracking.
-   ============================================ */
+/* ============================================================
+   AMBIENT WASH — the signature
 
-.font-display {
-  font-family: var(--font-display);
-  font-optical-sizing: auto;
-}
+   A single fixed layer tinted by --accent. As the carousel changes
+   the active project, the whole page takes on that brand's hue.
+   Kept under 0.2 alpha: a wash the eye reads as light in the room,
+   never as a coloured background.
+   ============================================================ */
 
-.text-display {
-  font-family: var(--font-display);
-  font-size: clamp(3.75rem, 11vw, 10rem);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.88;
-}
-
-.text-section-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 0.95;
-}
-
-.text-card-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-
-/* Small caps-ish label used for eyebrows and meta rows.
-   Kept from the old system because it still earns its place — it is the one
-   piece of structure that survives the soft reset. */
-.label {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--text-muted);
-}
-
-/* ============================================
-   GLASS SURFACES
-
-   A convincing pane needs four things at once:
-     1. a blurred, saturated backdrop
-     2. a diagonal tint — glass is never uniformly lit
-     3. a rim whose brightness *varies* around the edge (this is the tell)
-     4. depth shadow separating it from the field
-
-   The rim is drawn as a masked gradient border rather than a flat 1px line,
-   because a uniform border reads as a card and a varying one reads as a bevel.
-   ============================================ */
-
-.glass {
-  position: relative;
-  border-radius: var(--r-lg);
-  background: linear-gradient(
-    145deg,
-    var(--glass-tint-hi) 0%,
-    rgba(255, 255, 255, 0.04) 38%,
-    var(--glass-tint-lo) 100%
-  );
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  box-shadow:
-    var(--glass-shadow),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.03);
-  isolation: isolate;
-}
-
-/* Varying rim light — bright at the top-left, fading around to nothing. */
-.glass::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    145deg,
-    var(--glass-rim) 0%,
-    rgba(255, 255, 255, 0.08) 30%,
-    var(--glass-rim-dim) 55%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Specular sheen across the upper third. */
-.glass-sheen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    120% 80% at 15% -10%,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.04) 35%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Card content sits above the rim and sheen pseudo-elements. Written with
-   :where() so it carries zero specificity — any utility class on a child
-   (`absolute`, a custom z-index) still wins. */
-.glass > :where(*),
-.glass-light > :where(*) {
-  position: relative;
-  z-index: 2;
-}
-
-.glass-sm {
-  --glass-blur: 16px;
-  border-radius: var(--r-sm);
-}
-
-.glass-lg {
-  border-radius: var(--r-xl);
-}
-
-/* Brighter pane — used where the old design used flat white. */
-.glass-bright {
-  --glass-tint-hi: rgba(255, 255, 255, 0.24);
-  --glass-tint-lo: rgba(255, 255, 255, 0.1);
-  --glass-rim: rgba(255, 255, 255, 0.55);
-  --glass-blur: 34px;
-}
-
-/* Interactive panes lift toward the light on hover. */
-.glass-interactive {
-  transition:
-    transform 0.55s var(--ease-glass),
-    box-shadow 0.55s var(--ease-glass),
-    background 0.55s var(--ease-glass);
-}
-
-.glass-interactive:hover {
-  transform: translateY(-4px);
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.06) 38%,
-    rgba(255, 255, 255, 0.035) 100%
-  );
-  box-shadow:
-    0 34px 80px -24px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.04);
-}
-
-/* ---- Light glass — the contact inversion ---- */
-
-.glass-light {
-  position: relative;
-  border-radius: var(--r-lg);
-  background: linear-gradient(
-    145deg,
-    var(--light-tint-hi) 0%,
-    rgba(255, 255, 255, 0.65) 40%,
-    var(--light-tint-lo) 100%
-  );
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
-  box-shadow:
-    var(--light-shadow),
-    inset 0 1px 0 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.5);
-  isolation: isolate;
-}
-
-.glass-light::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    145deg,
-    var(--light-rim) 0%,
-    rgba(255, 255, 255, 0.4) 45%,
-    rgba(120, 110, 170, 0.16) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* ============================================
-   AMBIENT FIELD
-   Large, soft, slow. Compositor-only transforms — no blur filter, the
-   gradients are already soft enough, which keeps this ~free to animate.
-   ============================================ */
-
-.aura-layer {
+.wash {
   position: fixed;
-  inset: -20%;
-  pointer-events: none;
+  inset: 0;
   z-index: 0;
-  overflow: hidden;
-}
-
-.aura-orb {
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform;
-  opacity: 0.55;
-}
-
-@keyframes aura-drift-a {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  33% {
-    transform: translate3d(8vw, 6vh, 0) scale(1.14);
-  }
-  66% {
-    transform: translate3d(-5vw, 10vh, 0) scale(0.92);
-  }
-}
-
-@keyframes aura-drift-b {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1.05);
-  }
-  40% {
-    transform: translate3d(-10vw, -7vh, 0) scale(0.9);
-  }
-  75% {
-    transform: translate3d(6vw, 5vh, 0) scale(1.18);
-  }
-}
-
-@keyframes aura-drift-c {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(0.95);
-  }
-  50% {
-    transform: translate3d(7vw, -9vh, 0) scale(1.2);
-  }
-}
-
-/* ============================================
-   NAVBAR OVER THE LIGHT SECTION
-
-   The pill floats over both halves of the site, so it has to invert when the
-   contact section passes beneath it — otherwise it is white-on-white. Same
-   material, flipped; redefining the text tokens here means anything inside
-   that reads them (nav items, the hamburger) adapts without extra wiring.
-   ============================================ */
-
-.nav-on-light {
-  --text-primary: #16161d;
-  --text-secondary: #3a3a4d;
-  --text-muted: #5c5c72;
-  --nav-active-bg: rgba(22, 22, 40, 0.08);
-  --nav-active-rim: rgba(255, 255, 255, 0.9);
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.62) 42%,
-    rgba(255, 255, 255, 0.48) 100%
-  );
-  box-shadow:
-    0 18px 48px -24px rgba(40, 34, 80, 0.42),
-    inset 0 1px 0 0 rgba(255, 255, 255, 1);
-}
-
-.nav-on-light::before {
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0.5) 45%,
-    rgba(120, 110, 170, 0.22) 100%
-  );
-}
-
-/* ============================================
-   HERO HEADLINE HANDOFF
-
-   When the WebGL canvas takes over drawing the headline, the <h1> has to stay
-   in layout (the canvas measures its line boxes on every resize) *and* stay in
-   the accessibility tree — so only its paint is suppressed. `visibility:
-   hidden` would do neither: it drops the element from the a11y tree entirely,
-   which would leave screen reader users with no <h1> at all on the page.
-   ============================================ */
-
-/* Longhands, not the `-webkit-text-stroke` shorthand: Lightning CSS drops the
-   entire rule containing that shorthand, silently and with no warning, so the
-   whole declaration block vanishes from the compiled stylesheet. */
-.hero-outline {
-  color: transparent;
-  -webkit-text-stroke-width: 1.5px;
-  -webkit-text-stroke-color: rgba(255, 255, 255, 0.5);
-}
-
-.lens-handoff,
-.lens-handoff .hero-outline {
-  color: transparent;
-  -webkit-text-stroke-color: transparent;
-  user-select: none;
-}
-
-/* ============================================
-   HERO LENS
-   The disc sits above the hero content so its backdrop-filter bends the
-   ambient field *and* the copy behind it. The WebGL canvas that renders the
-   refracted headline is layered on top of this by useGlassLens.
-   ============================================ */
-
-.lens-disc {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 20;
-  border-radius: 50%;
   pointer-events: none;
-  opacity: 0;
-  will-change: transform;
-  /* Flat interior, bright rim — a disc of glass, not a sphere. A centre-heavy
-     gradient here is what makes the lens read as a ball, so the light is
-     pushed out to the edge instead. */
-  -webkit-backdrop-filter: blur(7px) saturate(200%) brightness(1.45);
-  backdrop-filter: blur(7px) saturate(200%) brightness(1.45);
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.045) 58%,
-    rgba(255, 255, 255, 0.13) 84%,
-    rgba(255, 255, 255, 0.26) 100%
-  );
-  box-shadow:
-    0 22px 55px -26px rgba(0, 0, 0, 0.5),
-    0 0 50px -12px rgba(255, 255, 255, 0.1),
-    inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  background:
+    radial-gradient(80vw 70vh at 12% 8%, rgb(var(--accent) / 0.17), transparent 68%),
+    radial-gradient(70vw 60vh at 92% 82%, rgb(var(--accent) / 0.12), transparent 66%);
+  transition: background 1.1s var(--ease);
 }
 
-/* ============================================
-   BUTTONS — pills
-   ============================================ */
+/* ============================================================
+   TYPE
+
+   Instrument Serif carries the voice; its italic does the emphasis.
+   Archivo handles prose. JetBrains Mono is reserved for things that
+   are literally data — indices, tech names, coordinates.
+   ============================================================ */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.display em {
+  font-style: italic;
+  /* The italic is the accent. Optical size differs enough between the
+     roman and italic cuts that it needs a nudge to sit on the same line. */
+  letter-spacing: -0.015em;
+  padding-right: 0.06em;
+}
+
+.t-hero {
+  font-size: clamp(3rem, 9.5vw, 8.5rem);
+}
+
+.t-section {
+  font-size: clamp(2.25rem, 5.5vw, 4.75rem);
+}
+
+.t-panel {
+  font-size: clamp(1.75rem, 3.2vw, 3rem);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.lede {
+  font-size: clamp(1.0625rem, 1.5vw, 1.375rem);
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   RULES + SHELL
+   ============================================================ */
+
+.shell {
+  width: var(--shell);
+  margin-inline: auto;
+}
+
+/* Anchor targets clear the fixed nav. */
+[id] {
+  scroll-margin-top: 5rem;
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+/* ============================================================
+   LINKS + BUTTONS
+
+   One shape language: a squared pill with a 1px edge. The solid
+   variant is ink; the ghost variant borrows --accent so calls to
+   action inherit whatever brand is on screen.
+   ============================================================ */
 
 .btn {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: -0.01em;
-  border-radius: var(--r-full);
+  --btn-pad-x: 1.5rem;
+  --btn-pad-y: 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.005em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border: 1px solid transparent;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
   transition:
-    transform 0.4s var(--ease-glass),
-    box-shadow 0.4s var(--ease-glass),
-    background 0.4s var(--ease-glass),
-    color 0.4s var(--ease-glass);
+    background-color 0.4s var(--ease),
+    color 0.4s var(--ease),
+    border-color 0.4s var(--ease),
+    transform 0.4s var(--ease);
 }
 
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.975);
 }
 
-/* Solid light pill on dark — the primary action. */
 .btn-solid {
-  background: linear-gradient(180deg, #ffffff 0%, #e6e6ee 100%);
-  color: #0b0b12;
-  box-shadow:
-    0 10px 30px -10px rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.08);
+  background: var(--ink);
+  color: var(--paper-lift);
 }
 
 .btn-solid:hover {
-  box-shadow:
-    0 16px 40px -10px rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 0 rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
+  background: rgb(var(--accent-ui));
 }
 
-.btn-solid:active {
-  transform: translateY(-2px) scale(0.96);
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
 }
 
-/* Glass pill on dark — the secondary action. */
-.btn-glass {
+.btn-ghost:hover {
+  border-color: var(--ink);
+  background: rgb(14 14 17 / 0.04);
+}
+
+/* Underline that draws in from the left on hover. Used for text links. */
+.ulink {
   position: relative;
-  color: var(--text-primary);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  backdrop-filter: blur(18px) saturate(170%);
-  box-shadow:
-    0 12px 34px -14px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  color: inherit;
+  text-decoration: none;
+  padding-bottom: 1px;
 }
 
-.btn-glass::before {
+.ulink::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.06) 60%,
-    rgba(255, 255, 255, 0.16) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.btn-glass:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
-}
-
-.btn-glass:active {
-  transform: translateY(-2px) scale(0.96);
-}
-
-/* Dark solid pill on the light section. */
-.btn-solid-dark {
-  background: linear-gradient(180deg, #26263a 0%, #101018 100%);
-  color: #ffffff;
-  box-shadow:
-    0 14px 34px -12px rgba(30, 26, 70, 0.55),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
-}
-
-.btn-solid-dark:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 20px 44px -12px rgba(30, 26, 70, 0.65),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
-}
-
-.btn-solid-dark:active {
-  transform: translateY(-2px) scale(0.96);
-}
-
-/* Light glass pill on the light section. */
-.btn-glass-light {
-  position: relative;
-  color: var(--light-text);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.55) 100%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-  backdrop-filter: blur(18px) saturate(150%);
-  box-shadow:
-    0 12px 30px -14px rgba(40, 34, 80, 0.4),
-    inset 0 1px 0 0 rgba(255, 255, 255, 1);
-}
-
-.btn-glass-light::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 1) 0%, rgba(120, 110, 170, 0.18) 100%);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.btn-glass-light:hover {
-  transform: translateY(-2px);
-}
-
-.btn-glass-light:active {
-  transform: translateY(-2px) scale(0.96);
-}
-
-/* ============================================
-   BENTO GRID
-   ============================================ */
-
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(150px, auto);
-  gap: 1.25rem;
-}
-
-/* ============================================
-   INPUTS — light glass
-   ============================================ */
-
-.input-glass-light {
+  left: 0;
+  bottom: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(120, 110, 170, 0.18);
-  border-radius: var(--r-sm);
-  color: var(--light-text);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 2px rgba(40, 34, 80, 0.06);
-  transition:
-    border-color 0.35s var(--ease-glass),
-    box-shadow 0.35s var(--ease-glass),
-    background 0.35s var(--ease-glass);
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease);
 }
 
-.input-glass-light::placeholder {
-  color: rgba(92, 92, 114, 0.6);
+.ulink:hover::after,
+.ulink:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
-.input-glass-light:focus {
-  outline: none;
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(99, 91, 255, 0.5);
-  box-shadow:
-    0 0 0 4px rgba(99, 91, 255, 0.12),
-    inset 0 1px 2px rgba(40, 34, 80, 0.05);
+/* ============================================================
+   WORK CAROUSEL
+
+   Native scroll-snap rather than scroll-hijacking: real momentum on
+   trackpads, real swipe on touch, real tab order, and the scrollbar
+   keeps meaning what it says.
+   ============================================================ */
+
+.rail {
+  display: flex;
+  gap: clamp(1rem, 2vw, 2rem);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--rail-inset);
+  padding-inline: var(--rail-inset);
+  padding-block: 0.5rem 2.5rem;
+  --rail-inset: max(1.5rem, calc((100vw - 1440px) / 2 + 1.5rem));
+  scrollbar-width: none;
 }
 
-/* ============================================
-   REVEAL — IntersectionObserver driven
-   ============================================ */
-
-.reveal-box {
-  opacity: 0;
-  transform: translateY(26px) scale(0.985);
-  transition:
-    opacity 0.9s var(--ease-glass),
-    transform 0.9s var(--ease-glass);
+.rail::-webkit-scrollbar {
+  display: none;
 }
 
-.reveal-box.active {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+.panel {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: min(64vw, 900px);
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--paper-lift);
+  isolation: isolate;
 }
 
-/* ============================================
-   NOISE — dialled back; glass already carries the texture
-   ============================================ */
+@media (max-width: 900px) {
+  .panel {
+    width: min(88vw, 620px);
+  }
+}
 
-.noise-overlay {
-  position: fixed;
+/* Capped against the viewport so the panel's title and tags stay on screen
+   with the image — a screenshot nobody can attribute is worth nothing. */
+.panel-shot {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--paper-deep);
+}
+
+@media (min-width: 901px) {
+  .panel-shot {
+    aspect-ratio: 16 / 9;
+    max-height: 46svh;
+  }
+}
+
+.panel-shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 1.2s var(--ease);
+}
+
+.panel:hover .panel-shot img {
+  transform: scale(1.03);
+}
+
+/* A colour veil in the project's own brand hue, lifted on hover so the
+   screenshot resolves. Gives the rail a rhythm of colour before any
+   individual site is legible. */
+.panel-veil {
+  position: absolute;
   inset: 0;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.018;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background: rgb(var(--accent) / 0.32);
+  mix-blend-mode: multiply;
+  transition: opacity 0.7s var(--ease);
 }
 
-/* ============================================
-   MOBILE
-   ============================================ */
+/* The veil gives the rail a rhythm of brand colour, but the panel you are
+   actually looking at should resolve on its own — colour for the queue,
+   clarity for the one in front of you. */
+.panel:hover .panel-veil,
+.panel:focus-visible .panel-veil,
+.panel[data-active] .panel-veil {
+  opacity: 0;
+}
 
-@media (max-width: 768px) {
-  :root {
-    /* Blur is the single most expensive thing here; ease off on phones. */
-    --glass-blur: 20px;
-  }
+.panel-meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 0.25rem 0;
+}
 
-  .bento-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: auto;
-    gap: 0.875rem;
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  white-space: nowrap;
+}
+
+/* The arrow disc on each panel. */
+.disc {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  transition:
+    background-color 0.45s var(--ease),
+    color 0.45s var(--ease),
+    border-color 0.45s var(--ease);
+}
+
+.panel:hover .disc,
+.panel:focus-visible .disc {
+  background: rgb(var(--accent-ui));
+  border-color: rgb(var(--accent-ui));
+  color: #fff;
+}
+
+/* The rail's prev/next controls are <button class="disc">, so they need the
+   hover treatment the panel gives its own disc. */
+button.disc:not(:disabled):hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper-lift);
+}
+
+button.disc:disabled {
+  cursor: default;
+}
+
+/* ============================================================
+   REVEAL
+   ============================================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.9s var(--ease),
+    transform 0.9s var(--ease);
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Line-by-line rise for the hero. The padding/margin pair keeps the mask clear
+   of descenders — at a 0.92 line-height a bare `overflow: hidden` slices the
+   tail off any `y` or `g` on the last line. */
+.rise {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.rise > span {
+  display: block;
+  transform: translateY(105%);
+  animation: rise 1.05s var(--ease) forwards;
+}
+
+@keyframes rise {
+  to {
+    transform: none;
   }
 }
 
-/* ============================================
+.fade-up {
+  opacity: 0;
+  animation: fade-up 0.9s var(--ease) forwards;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.field {
+  width: 100%;
+  background: var(--paper-lift);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.875rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--ink);
+  transition:
+    border-color 0.35s var(--ease),
+    background-color 0.35s var(--ease);
+}
+
+.field::placeholder {
+  color: var(--ink-3);
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--ink);
+  background: #fff;
+}
+
+/* ============================================================
    REDUCED MOTION
-   ============================================ */
+   ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -717,12 +516,17 @@
     transition-duration: 0.01ms !important;
   }
 
-  .reveal-box {
+  .reveal,
+  .fade-up {
     opacity: 1;
     transform: none;
   }
 
-  .aura-orb {
-    animation: none !important;
+  .rise > span {
+    transform: none;
+  }
+
+  .rail {
+    scroll-behavior: auto;
   }
 }
