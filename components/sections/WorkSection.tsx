@@ -183,7 +183,7 @@ export function WorkSection() {
           <div>
             <p className="mono">Selected work</p>
             <h2 className="display t-section mt-4">
-              Seven brands, <em>one build.</em>
+              Brands I&rsquo;ve <em>built for.</em>
             </h2>
           </div>
 
