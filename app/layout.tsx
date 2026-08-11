@@ -24,15 +24,17 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 });
 
+const title = 'Jack Knoell — Product-Minded Full-Stack Engineer';
+
 const description =
-  'Frontend developer in Irvine, California. I build the interfaces brands are remembered by — for Northern Trust, CareDx, Vanguard Renewables and Edenspiekermann.';
+  'Product-minded full-stack engineer in Irvine, California. I build the interfaces brands are remembered by — Northern Trust, CareDx, Vanguard Renewables, Edenspiekermann.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://jackknoell.dev'),
-  title: 'Jack Knoell — Frontend Developer',
+  title,
   description,
   openGraph: {
-    title: 'Jack Knoell — Frontend Developer',
+    title,
     description,
     url: 'https://jackknoell.dev',
     siteName: 'Jack Knoell',
@@ -40,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jack Knoell — Frontend Developer',
+    title,
     description,
   },
 };
