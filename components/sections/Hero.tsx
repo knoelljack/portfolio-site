@@ -15,7 +15,7 @@ export function Hero() {
       className="shell flex min-h-svh flex-col justify-center pb-16 pt-28 md:justify-end md:pb-20 md:pt-48"
     >
       <p className="mono fade-up" style={{ animationDelay: '0.15s' }}>
-        Frontend developer
+        Product-minded full-stack engineer
       </p>
 
       <h1 className="display t-hero mt-8 md:mt-10">

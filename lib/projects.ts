@@ -15,7 +15,7 @@ export const projects: Project[] = [
     title: 'Northern Trust',
     discipline: 'Wealth management platform',
     summary:
-      'Full-stack financial platform with 45+ reusable React components, Java backend integration, and AEM CMS.',
+      'Full-stack financial platform with 50+ reusable React components, Java backend integration, and AEM CMS.',
     technologies: ['React', 'Java', 'AEM', 'TypeScript'],
     accent: '17 87 64',
     image: '/work/northern-trust.jpg',

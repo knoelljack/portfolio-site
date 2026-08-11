@@ -3,10 +3,12 @@
 import { useEffect, useRef } from 'react';
 
 const STACK = [
-  ['Languages', ['TypeScript', 'JavaScript', 'Java', 'Liquid']],
+  ['Languages', ['TypeScript', 'JavaScript', 'SQL', 'Liquid']],
   ['Frameworks', ['React', 'Next.js', 'React Native', 'Node.js']],
-  ['Data', ['GraphQL', 'Prisma', 'MongoDB', 'DatoCMS', 'AEM']],
-  ['Platform', ['Vercel', 'AWS Lambda', 'Cloudflare Workers', 'Shopify']],
+  ['Styling', ['Tailwind', 'Sass', 'CSS', 'Figma']],
+  ['Data', ['GraphQL', 'Contentful', 'DatoCMS', 'AEM', 'MongoDB']],
+  ['Testing', ['Vitest', 'Storybook', 'GitHub Actions']],
+  ['Platform', ['Vercel', 'Cloudflare Workers', 'Shopify']],
 ] as const;
 
 /** Fades elements in as they enter the viewport. */
@@ -48,12 +50,14 @@ export function AboutSection() {
           </h2>
           <p className="lede mt-8 max-w-[52ch]">
             I believe every interface is a built structure. Every pixel serves a purpose, and every
-            interaction should feel grounded in logic. My work bridges the gap between precise
-            engineering and human-centric design.
+            interaction should feel grounded in logic. That logic runs the full depth of the product
+            — component architecture and CMS modeling through to the serverless APIs behind them.
           </p>
           <p className="lede mt-6 max-w-[52ch]">
             Shipped across fintech, health, energy, automotive and commerce — from enterprise
-            platforms behind a login to consumer apps used daily.
+            platforms behind a login to consumer apps used daily. Always alongside designers,
+            stakeholders and content teams, turning tangled requirements into systems that outlast
+            the brief.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
