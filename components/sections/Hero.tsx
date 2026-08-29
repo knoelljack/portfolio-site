@@ -26,7 +26,7 @@ export function Hero() {
             />
           ))}
 
-          <p className="mono">Full-stack engineer — Irvine, California</p>
+          <p className="mono">Full-stack engineer</p>
 
           <h1 className="t-hero duo mt-7 max-w-[30ch] md:mt-9">
             <b>Jack Knoell builds interfaces and the systems under them.</b> Component architecture,

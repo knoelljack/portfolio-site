@@ -36,6 +36,10 @@
   --accent: #4137ff;
   --accent-deep: #2f26d6;
 
+  /* The hover highlight. Translucent rather than a solid grey so it reads the
+     same over the white ground and over an already-lifted row. */
+  --hl: rgb(12 12 20 / 0.05);
+
   --shell: min(1400px, 100% - 3rem);
   --rail: 13.5rem;
 }
@@ -242,11 +246,20 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* The rail's own box keeps shell width so its rule lines up with every other
+   rule on the page; the pull-back that cancels the highlight's padding lives
+   on the children instead. */
+.rail > .rail-link {
+  margin-left: -0.5rem;
+}
+
+/* The gap is the highlight's padding plus this, so text-to-text spacing is
+   unchanged from before the fill existed. */
 .rail-links {
   display: flex;
-  gap: 1.25rem;
+  gap: 0.25rem;
   list-style: none;
-  margin: 0;
+  margin: 0 -0.5rem 0 0;
   padding: 0;
 }
 
@@ -274,6 +287,7 @@
 
   .rail-links {
     display: block;
+    margin: 0 0 0 -0.5rem;
     /* Indented past the mark so the link column aligns with the name's
        first letter rather than with the pixel hanging beside it. */
     padding-left: 0.9375rem;
@@ -282,15 +296,28 @@
 
 .rail-link {
   display: block;
+  /* Shrink-wraps the label so the highlight reads as a chip around the word
+     rather than a band across the whole rail column. */
+  width: fit-content;
   color: var(--ink);
   text-decoration: none;
-  padding-block: 0.3125rem;
-  transition: color 0.12s linear;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 2px;
+  transition:
+    color 0.12s linear,
+    background-color 0.12s linear;
 }
 
+/* The active section is marked by colour only. Keeping the fill exclusive to
+   hover and focus stops the two signals from reading as the same state. */
 .rail-link:hover,
 .rail-link[aria-current] {
   color: var(--accent);
+}
+
+.rail-link:hover,
+.rail-link:focus-visible {
+  background: var(--hl);
 }
 
 /* ============================================================
@@ -298,26 +325,45 @@
 
    Hovers are quick, quiet colour shifts. Nothing grows, nothing
    springs; the arrow is the only thing that moves.
+
+   Interactive text also takes a soft highlight behind it. The fill
+   is sized with padding and pulled back by an equal negative
+   margin, so it can be larger than the text without moving
+   anything around it — and on an inline link the vertical padding
+   costs no line height at all. Buttons are excluded: they carry
+   their own fill already, and a highlight under one would just
+   read as a second, blurrier button.
    ============================================================ */
+
+.link,
+.link-quiet {
+  text-decoration: none;
+  padding: 0.125rem 0.3125rem;
+  margin-inline: -0.3125rem;
+  border-radius: 2px;
+  transition:
+    color 0.12s linear,
+    background-color 0.12s linear;
+}
 
 .link {
   color: var(--accent);
-  text-decoration: none;
-  transition: color 0.12s linear;
 }
 
-.link:hover {
+.link:hover,
+.link:focus-visible {
   color: var(--accent-deep);
+  background: var(--hl);
 }
 
 .link-quiet {
   color: var(--ink-2);
-  text-decoration: none;
-  transition: color 0.12s linear;
 }
 
-.link-quiet:hover {
+.link-quiet:hover,
+.link-quiet:focus-visible {
   color: var(--accent);
+  background: var(--hl);
 }
 
 .btn {
@@ -388,8 +434,10 @@ a:hover > .nudge {
 .reveal-detail {
   position: absolute;
   top: 100%;
-  left: 0;
-  margin-top: 0.25rem;
+  /* Offsets match the highlight's padding on .link-quiet, so the detail still
+     lines up with the label's first letter rather than with its fill. */
+  left: 0.3125rem;
+  margin-top: 0.125rem;
   white-space: nowrap;
   opacity: 0;
   transform: translateY(-2px);
@@ -462,7 +510,7 @@ a:hover > .nudge {
 
 .work-row:hover,
 .work-row:focus-visible {
-  background: var(--paper-lift);
+  background: var(--hl);
   padding-left: 0.75rem;
 }
 
