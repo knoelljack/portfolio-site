@@ -173,7 +173,6 @@
 
 .duo {
   color: var(--ink-2);
-  margin: 0;
 }
 
 .duo b {
@@ -566,7 +565,7 @@ a:hover > .nudge {
   object-position: top center;
 }
 
-/* Fixed height and clamped to two lines: the summaries differ in length, and
+/* Fixed height and clamped to three lines: the summaries differ in length, and
    a preview that resizes between rows reads as a wobble, not a transition. */
 .preview-summary {
   height: 3.625rem;
