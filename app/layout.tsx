@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Geist, JetBrains_Mono } from 'next/font/google';
+import { Instrument_Sans, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Rail } from '@/components/sections/Rail';
 
-const geist = Geist({
+const grotesk = Instrument_Sans({
   subsets: ['latin'],
-  variable: '--font-geist',
+  variable: '--font-grotesk',
   display: 'swap',
 });
 
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${grotesk.variable} ${jetbrains.variable}`}>
       <body>
         <div className="grain" aria-hidden="true" />
         <Rail />

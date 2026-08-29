@@ -110,8 +110,11 @@ export function ContactSection() {
                   />
                 </div>
 
+                {/* Deliberately not red: ultramarine is the only colour in this
+                    palette. The alert role and the explicit copy carry the
+                    meaning, so nothing here leans on colour alone. */}
                 {status === 'error' && (
-                  <p className="text-[0.875rem] text-[#b42318]" role="alert">
+                  <p className="text-[0.875rem] text-[var(--ink)]" role="alert">
                     That didn&rsquo;t send. Try again, or email knoelljack@gmail.com directly.
                   </p>
                 )}

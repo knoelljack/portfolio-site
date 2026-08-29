@@ -3,35 +3,35 @@
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
-  --font-sans: var(--font-geist);
+  --font-sans: var(--font-grotesk);
   --font-mono: var(--font-jetbrains);
 }
 
 /* ============================================================
    TOKENS
 
-   One warm paper ground, near-black ink, a single warm grey for
+   A white ground, near-black ink, a single neutral grey for
    everything secondary, and exactly one chromatic accent. Client
    brand colour lives inside the screenshots and nowhere else.
    ============================================================ */
 
 :root {
-  --paper: #fbfaf6;
-  --paper-lift: #f7f6ef;
-  --paper-deep: #f0efe6;
+  --paper: #fdfdfd;
+  --paper-lift: #f6f6f7;
+  --paper-deep: #eeeef0;
 
-  --ink: #0b0b0a;
-  /* 4.9:1 on --paper. Carries the continuation half of every two-tone
+  --ink: #0b0b0c;
+  /* 5.2:1 on --paper. Carries the continuation half of every two-tone
      sentence, so it has to hold up at body size, not just as a whisper. */
-  --ink-2: #6f6d69;
-  --ink-3: #6f6d69;
+  --ink-2: #6b6b70;
+  --ink-3: #6b6b70;
   /* Decoration only — fails AA by design. Never put words here. */
-  --ink-faint: #b3b0a9;
+  --ink-faint: #c2c2c6;
 
-  /* Warm hairlines: a browner black at low alpha reads as a deeper shade
-     of the paper rather than as a grey line drawn on top of it. */
-  --line: rgb(59 44 0 / 0.1);
-  --line-strong: rgb(54 41 0 / 0.2);
+  /* Neutral hairlines with a hair of cool in them. On a white ground a warm
+     line reads as a stain; a barely-cool one reads as a shadow of the edge. */
+  --line: rgb(12 12 20 / 0.1);
+  --line-strong: rgb(12 12 20 / 0.2);
 
   --accent: #4137ff;
   --accent-deep: #2f26d6;
@@ -99,15 +99,20 @@
    ============================================================ */
 
 /* feTurbulence rather than a bitmap: no request, no cache entry, and it
-   resolutions-up on a retina display instead of blurring. */
+   resolutions-up on a retina display instead of blurring.
+
+   Tuned down hard for the white ground. Multiply-blended noise that read as
+   paper tooth on eggshell reads as dirt on white, so this runs at roughly a
+   third of its old strength and at a finer frequency — the grain should only
+   be legible as an absence of flatness, never as speckle. */
 .grain {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.22;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E");
 }
 
 /* Placed by hand at slightly-off angles. A perfect square on a perfect
