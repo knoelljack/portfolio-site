@@ -1,19 +1,11 @@
 import type { Metadata } from 'next';
-import { Instrument_Serif, Archivo, JetBrains_Mono } from 'next/font/google';
+import { Geist, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { Nav } from '@/components/sections/Nav';
+import { Rail } from '@/components/sections/Rail';
 
-const instrument = Instrument_Serif({
+const geist = Geist({
   subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
-  variable: '--font-instrument',
-  display: 'swap',
-});
-
-const archivo = Archivo({
-  subsets: ['latin'],
-  variable: '--font-archivo',
+  variable: '--font-geist',
   display: 'swap',
 });
 
@@ -27,7 +19,7 @@ const jetbrains = JetBrains_Mono({
 const title = 'Jack Knoell — Product-Minded Full-Stack Engineer';
 
 const description =
-  'Product-minded full-stack engineer in Irvine, California. I build the interfaces brands are remembered by — Northern Trust, CareDx, Vanguard Renewables, Edenspiekermann.';
+  'Full-stack engineer in Irvine, California. Interfaces, component systems and the APIs behind them — Northern Trust, CareDx, Vanguard Renewables, Edenspiekermann.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://jackknoell.dev'),
@@ -49,11 +41,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${instrument.variable} ${archivo.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${geist.variable} ${jetbrains.variable}`}>
       <body>
-        {/* Tinted by whichever project is in view. See WorkSection. */}
-        <div className="wash" aria-hidden="true" />
-        <Nav />
+        <div className="grain" aria-hidden="true" />
+        <Rail />
         <main className="relative z-10">{children}</main>
       </body>
     </html>

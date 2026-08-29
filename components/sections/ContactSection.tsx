@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
@@ -29,99 +30,103 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="shell py-24 md:py-32">
-      <hr className="rule" />
+    <section id="contact" className="shell">
+      <div className="indent pb-20 md:pb-28">
+        <hr className="rule" />
+        <p className="mono mt-7">Contact</p>
 
-      <p className="mono mt-8">Contact</p>
+        <div className="mt-8 grid gap-12 md:mt-10 md:grid-cols-12 md:gap-10">
+          <div className="md:col-span-5">
+            <h2 className="t-lead duo max-w-[24ch]">
+              <b>Open to new projects.</b> Tell me what you are building.
+            </h2>
 
-      <div className="mt-12 grid gap-14 md:mt-16 md:grid-cols-12 md:gap-12">
-        <div className="md:col-span-6">
-          <h2 className="display t-section">
-            Let&rsquo;s build <em>something together.</em>
-          </h2>
-
-          <dl className="mt-12 grid gap-8 sm:grid-cols-2">
-            <div>
-              <dt className="mono">Email</dt>
-              <dd className="mt-2 text-[0.9375rem]">
-                <a href="mailto:knoelljack@gmail.com" className="ulink">
-                  knoelljack@gmail.com
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="mono">Availability</dt>
-              <dd className="mt-2 text-[0.9375rem]" style={{ color: 'var(--ink-2)' }}>
-                Open to new projects
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="md:col-span-6 md:col-start-8">
-          {status === 'sent' ? (
-            <div className="border-t pt-8" style={{ borderColor: 'var(--line)' }}>
-              <p className="display" style={{ fontSize: 'clamp(1.5rem,3vw,2.25rem)' }}>
-                Message sent.
-              </p>
-              <p className="lede mt-3">I&rsquo;ll get back to you shortly.</p>
-              <button
-                type="button"
-                onClick={() => setStatus('idle')}
-                className="btn btn-ghost mt-8"
-              >
-                Send another
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="grid gap-5">
+            <dl className="mt-8 grid gap-6">
               <div>
-                <label htmlFor="name" className="mono">
-                  Name
-                </label>
-                <input id="name" name="name" required className="field mt-2" autoComplete="name" />
+                <dt className="mono">Email</dt>
+                <dd className="mt-1.5">
+                  <a href="mailto:knoelljack@gmail.com" className="link">
+                    knoelljack@gmail.com
+                  </a>
+                </dd>
               </div>
               <div>
-                <label htmlFor="email" className="mono">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="field mt-2"
-                  autoComplete="email"
-                />
+                <dt className="mono">Based in</dt>
+                <dd className="mt-1.5 text-[var(--ink-2)]">Irvine, California</dd>
               </div>
-              <div>
-                <label htmlFor="message" className="mono">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  className="field mt-2 resize-y"
-                />
+            </dl>
+          </div>
+
+          <div className="md:col-span-6 md:col-start-7">
+            {status === 'sent' ? (
+              <div className="card">
+                <p className="t-row">Message sent.</p>
+                <p className="body mt-2">I&rsquo;ll get back to you shortly.</p>
+                <button
+                  type="button"
+                  onClick={() => setStatus('idle')}
+                  className="btn btn-ghost mt-6"
+                >
+                  Send another
+                </button>
               </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="grid gap-4">
+                <div>
+                  <label htmlFor="name" className="mono">
+                    Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    required
+                    className="field mt-1.5"
+                    autoComplete="name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="mono">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="field mt-1.5"
+                    autoComplete="email"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="mono">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={5}
+                    className="field mt-1.5 resize-y"
+                  />
+                </div>
 
-              {status === 'error' && (
-                <p className="text-[0.875rem]" style={{ color: '#B42318' }} role="alert">
-                  That didn&rsquo;t send. Try again, or email knoelljack@gmail.com directly.
-                </p>
-              )}
+                {status === 'error' && (
+                  <p className="text-[0.875rem] text-[#b42318]" role="alert">
+                    That didn&rsquo;t send. Try again, or email knoelljack@gmail.com directly.
+                  </p>
+                )}
 
-              <button
-                type="submit"
-                disabled={status === 'sending'}
-                className="btn btn-solid justify-self-start disabled:opacity-50"
-              >
-                {status === 'sending' ? 'Sending' : 'Send message'}
-              </button>
-            </form>
-          )}
+                <button
+                  type="submit"
+                  disabled={status === 'sending'}
+                  className="btn btn-solid justify-self-start disabled:opacity-50"
+                >
+                  {status === 'sending' ? 'Sending' : 'Send message'}
+                  <ArrowRight className="nudge h-4 w-4" aria-hidden="true" />
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </section>

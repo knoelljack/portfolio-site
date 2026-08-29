@@ -1,35 +1,54 @@
-const LINES = [
-  <>I build the interfaces</>,
-  <>brands are</>,
-  <>
-    <em>remembered by.</em>
-  </>,
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
+
+/**
+ * Placed by eye against things on the page — the eyebrow, the end of the
+ * button row — rather than scattered into open space, where
+ * they read as dust instead of as marks. Offsets are measured from the
+ * content column, so they hold their relationships at every width. See
+ * `.pixel` in globals.css.
+ */
+const PIXELS = [
+  { top: '0.25rem', left: '-1.25rem', rotate: '12deg' },
+  { bottom: '-1.5rem', left: '15.5rem', rotate: '22deg' },
 ];
 
 export function Hero() {
-  // Bottom-anchored on desktop, where the void above reads as gallery wall. On
-  // a phone that same void is most of the screen, so the block centres instead.
   return (
-    <header
-      id="top"
-      className="shell flex min-h-svh flex-col justify-center pb-16 pt-28 md:justify-end md:pb-20 md:pt-48"
-    >
-      <p className="mono fade-up" style={{ animationDelay: '0.15s' }}>
-        Product-minded full-stack engineer
-      </p>
+    <header id="top" className="shell">
+      <div className="indent pb-24 pt-20 md:pb-32 md:pt-36">
+        <div className="relative">
+          {PIXELS.map(({ rotate, ...position }, i) => (
+            <span
+              key={i}
+              aria-hidden="true"
+              className="pixel"
+              style={{ ...position, transform: `rotate(${rotate})` }}
+            />
+          ))}
 
-      <h1 className="display t-hero mt-8 md:mt-10">
-        {LINES.map((line, i) => (
-          <span className="rise" key={i}>
-            <span style={{ animationDelay: `${0.25 + i * 0.11}s` }}>{line}</span>
-          </span>
-        ))}
-      </h1>
+          <p className="mono">Full-stack engineer — Irvine, California</p>
 
-      <div className="fade-up mt-12 md:mt-16" style={{ animationDelay: '0.85s' }}>
-        <a href="#work" className="btn btn-solid">
-          See the work
-        </a>
+          <h1 className="t-hero duo mt-7 max-w-[30ch] md:mt-9">
+            <b>Jack Knoell builds interfaces and the systems under them.</b> Component architecture,
+            CMS modeling, and the serverless APIs behind both.
+          </h1>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3 md:mt-11">
+            <a href="#work" className="btn btn-solid">
+              See the work
+              <ArrowRight className="nudge h-4 w-4" aria-hidden="true" />
+            </a>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-ghost"
+            >
+              Resume
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+        </div>
       </div>
     </header>
   );
