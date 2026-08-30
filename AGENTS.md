@@ -28,6 +28,13 @@ type scale, and every component class the sections use. Sections in
 `components/sections/` are expected to reach for those classes rather than
 re-deriving colour or spacing in Tailwind utilities.
 
+The About section's technology inventory drives a canvas particle stage
+(`components/sections/StackMorph.tsx`). Adding a technology there means either
+vendoring its mark into `components/sections/stack-marks.ts` — that file's header
+has the one-line command — or passing `null` for the slug, which falls back to a
+typographic pixel plate. A missing slug silently renders nothing, so it is not a
+list you can extend with a bare string.
+
 ## Maintaining this file
 
 Keep this file for knowledge useful to almost every future agent session in this project.
