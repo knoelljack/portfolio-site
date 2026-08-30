@@ -16,10 +16,10 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 });
 
-const title = 'Jack Knoell — Product-Minded Full-Stack Engineer';
+const title = 'Jack Knoell — Portfolio';
 
 const description =
-  'Full-stack engineer in Irvine, California. Interfaces, component systems and the APIs behind them — Northern Trust, CareDx, Vanguard Renewables, Edenspiekermann.';
+  'Front-end engineer in Irvine, California. Interfaces and the systems behind them — Northern Trust, CareDx, Vanguard Renewables, Edenspiekermann.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://jackknoell.dev'),
