@@ -26,11 +26,10 @@ export function Hero() {
             />
           ))}
 
-          <p className="mono">Full-stack engineer</p>
+          <p className="mono">Front-end engineer</p>
 
           <h1 className="t-hero duo mt-7 max-w-[30ch] md:mt-9">
-            <b>Jack Knoell builds interfaces and the systems under them.</b> Component architecture,
-            CMS modeling, and the serverless APIs behind both.
+            <b>Jack Knoell builds interfaces.</b> And the systems behind them.
           </h1>
 
           <div className="mt-9 flex flex-wrap items-center gap-3 md:mt-11">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const LINKS = [
   ['Work', 'work'],
@@ -10,6 +10,10 @@ const LINKS = [
 
 export function Rail() {
   const [active, setActive] = useState<string | null>(null);
+  const [travel, setTravel] = useState(0);
+  const railRef = useRef<HTMLElement>(null);
+  const nameRef = useRef<HTMLAnchorElement>(null);
+  const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
 
   useEffect(() => {
     const sections = LINKS.map(([, id]) => document.getElementById(id)).filter(
@@ -39,14 +43,38 @@ export function Rail() {
     return () => io.disconnect();
   }, []);
 
+  const place = useCallback(() => {
+    const name = nameRef.current;
+    // Only the desktop rail stacks the links under the name, so only there is
+    // there anywhere for the mark to travel to; on the mobile row it stays put.
+    const wide = window.matchMedia('(min-width: 1024px)').matches;
+    const target = wide && active ? linkRefs.current.get(active) : null;
+    // Every rail link shares one typography and one box, so the offset between
+    // two of them is the whole move — the mark keeps its position within the
+    // link it lands beside. offsetTop is a layout value, unperturbed by the
+    // mark's own transform.
+    setTravel(name && target ? target.offsetTop - name.offsetTop : 0);
+  }, [active]);
+
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    // `observe` delivers a callback immediately, so the observer does the first
+    // placement too — on mount, and again on every reflow and breakpoint change.
+    const ro = new ResizeObserver(place);
+    ro.observe(rail);
+    return () => ro.disconnect();
+  }, [place]);
+
   return (
     <div className="rail-shell">
       <div className="shell">
-        <nav className="rail" aria-label="Primary">
-          <a href="#top" className="rail-link" style={{ color: 'var(--accent)' }}>
+        <nav className="rail" aria-label="Primary" ref={railRef}>
+          <a href="#top" className="rail-link" style={{ color: 'var(--accent)' }} ref={nameRef}>
             <span
               aria-hidden="true"
-              className="mr-2 inline-block h-[7px] w-[7px] translate-y-[-1px] rotate-[14deg] bg-[var(--accent)] align-middle"
+              className="rail-mark"
+              style={{ transform: `translateY(${travel - 1}px) rotate(14deg)` }}
             />
             Jack Knoell
           </a>
@@ -57,6 +85,10 @@ export function Rail() {
                   href={`#${id}`}
                   className="rail-link"
                   aria-current={active === id ? 'location' : undefined}
+                  ref={(el) => {
+                    if (el) linkRefs.current.set(id, el);
+                    else linkRefs.current.delete(id);
+                  }}
                 >
                   {label}
                 </a>

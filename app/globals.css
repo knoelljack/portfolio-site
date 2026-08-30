@@ -238,12 +238,26 @@
 }
 
 .rail {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
   padding-block: 0.9375rem;
   border-bottom: 1px solid var(--line);
+}
+
+/* The accent square doubles as the active-section indicator. It stays in the
+   name link's flow — so it costs the same space wherever it points — and
+   travels on transform alone, which is why the rail links all share a box. */
+.rail-mark {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 0.5rem;
+  background: var(--accent);
+  vertical-align: middle;
+  transition: transform 0.18s ease-out;
 }
 
 /* The rail's own box keeps shell width so its rule lines up with every other
@@ -308,8 +322,9 @@
     background-color 0.12s linear;
 }
 
-/* The active section is marked by colour only. Keeping the fill exclusive to
-   hover and focus stops the two signals from reading as the same state. */
+/* The active section is marked by colour (and, on desktop, the travelling
+   mark) — never by the fill. Keeping the fill exclusive to hover and focus
+   stops the two signals from reading as the same state. */
 .rail-link:hover,
 .rail-link[aria-current] {
   color: var(--accent);
