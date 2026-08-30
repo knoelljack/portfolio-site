@@ -231,7 +231,19 @@ function sampleMark(tech: Tech): Int16Array {
     const y = cells[i * 2 + 1];
     if (BAYER[(y % 4) * 4 + (x % 4)] / 16 < keep) thinned.push(x, y);
   }
-  return Int16Array.from(thinned);
+
+  const kept = thinned.length / 2;
+  if (kept <= MAX_PARTICLES) return Int16Array.from(thinned);
+
+  const capped = new Int16Array(MAX_PARTICLES * 2);
+  let w = 0;
+  for (let i = 0; i < kept; i++) {
+    if (Math.floor((i * MAX_PARTICLES) / kept) < Math.floor(((i + 1) * MAX_PARTICLES) / kept)) {
+      capped[w++] = thinned[i * 2];
+      capped[w++] = thinned[i * 2 + 1];
+    }
+  }
+  return capped;
 }
 
 export function StackMorph() {
@@ -546,7 +558,7 @@ export function StackMorph() {
                     aria-pressed={active === index}
                     onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(index)}
                     onPointerLeave={(e) => e.pointerType === 'mouse' && release(index)}
-                    onFocus={() => setHovered(index)}
+                    onFocus={(e) => e.currentTarget.matches(':focus-visible') && setHovered(index)}
                     onBlur={() => release(index)}
                     onClick={() => pin(index)}
                   >
