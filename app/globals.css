@@ -645,6 +645,106 @@ a:hover > .nudge {
 }
 
 /* ============================================================
+   STACK MORPH
+
+   The technology list is the content; the panel beside it is the
+   page's own pixel motif briefly animated. The canvas is
+   decoration — every name is a real button, and hover, focus and
+   tap all drive the stage the same way.
+   ============================================================ */
+
+.stack-grid {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .stack-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 2.5rem clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+
+  /* Explicit placement, so the stage can lead in the DOM — and so sit
+     directly under the lead on a phone — while still reading as the right
+     hand column beside the list on a wide screen. */
+  .stack-stage-col {
+    grid-area: 1 / 7 / 2 / -1;
+  }
+
+  .stack-list-col {
+    grid-area: 1 / 1 / 2 / 6;
+  }
+}
+
+/* The box is reserved before the canvas has drawn anything, so morphing in
+   never moves the list under it. */
+.stack-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  background: var(--paper-lift);
+}
+
+.stack-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The stage names itself in type as well as in pixels. One reserved line: the
+   longest name in the list must not be able to reflow the panel under it. */
+.stack-caption {
+  margin: 0.75rem 0 0;
+  min-height: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--ink);
+}
+
+.stack-group + .stack-group {
+  margin-top: 1.375rem;
+}
+
+.stack-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem 0.1875rem;
+  list-style: none;
+  /* Pulls the first chip's own padding back so the names line up with the
+     group label above them. */
+  margin: 0.375rem 0 0 -0.375rem;
+  padding: 0;
+}
+
+.stack-name {
+  appearance: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  letter-spacing: -0.012em;
+  color: var(--ink-2);
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  padding: 0.1875rem 0.375rem;
+  cursor: pointer;
+  transition:
+    color 0.12s linear,
+    background-color 0.12s linear;
+}
+
+/* Same division as the rail: the active name is marked by colour alone, and
+   the fill stays exclusive to hover and focus. */
+.stack-name[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.stack-name:hover,
+.stack-name:focus-visible {
+  color: var(--accent);
+  background: var(--hl);
+}
+
+/* ============================================================
    CARDS + FORM
    ============================================================ */
 
