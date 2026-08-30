@@ -322,8 +322,9 @@
     background-color 0.12s linear;
 }
 
-/* The active section is marked by colour only. Keeping the fill exclusive to
-   hover and focus stops the two signals from reading as the same state. */
+/* The active section is marked by colour (and, on desktop, the travelling
+   mark) — never by the fill. Keeping the fill exclusive to hover and focus
+   stops the two signals from reading as the same state. */
 .rail-link:hover,
 .rail-link[aria-current] {
   color: var(--accent);
