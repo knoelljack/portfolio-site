@@ -6,4 +6,5 @@ next-env.d.ts
 package-lock.json
 yarn.lock
 .vercel
-coverage 
+coverage
+.claude
