@@ -1,14 +1,13 @@
 import gsap from 'gsap';
-import { MARK_PATHS } from '@/components/sections/stack-marks';
 import { cellsOf, coverage, tilesOf } from './raster';
 import { createPointLayer, STRIDE, type PointLayer } from './points';
 
 /**
  * The opening reel: five seconds that build the page from a single pixel.
  *
- *   pixel → grid → flood → "Interfaces" → the work, laid out and reflowed →
- *   pixelated, shattered, swirled → "Systems" → React, Next.js, TypeScript →
- *   the name, landing as pixel type exactly where the hero sets it.
+ *   pixel → grid → flood → "Interfaces" → the work, laid out in colour and
+ *   reflowed → pixelated, shattered, swirled → "Systems" → the name, landing
+ *   as pixel type exactly where the page sets it.
  *
  * Every frame is a pure function of the playhead. GSAP owns the DOM beats and
  * the particle field is recomputed from `t` alone, so skipping is a seek and a
@@ -33,33 +32,31 @@ const T = {
   flood: 0.8,
   card1: 1.08,
   card1Out: 1.42,
-  boxes: 1.48,
-  reflow: 1.98,
-  mosaic: 2.34,
+  /* The orange drains away column by column as the boxes arrive. */
+  drain: 1.44,
+  boxes: 1.5,
+  reflow: 2.02,
+  mosaic: 2.4,
   /* A few frames of the pixelated boxes, still in place, before they burst. */
-  burst: 2.41,
-  orbit: 2.52,
-  card2: 2.44,
-  card2Out: 2.745,
-  marks: [2.8, 3.1, 3.4],
-  name: 3.7,
-  resolve: 4.26,
-  handoff: 4.32,
-  end: 5,
+  burst: 2.47,
+  orbit: 2.58,
+  card2: 2.5,
+  card2Out: 3.02,
+  name: 3.12,
+  resolve: 3.74,
+  handoff: 3.8,
+  end: 4.6,
 };
 
-const MARK_DUR = 0.13;
-const NAME_DUR = 0.32;
-const MARKS = [
-  ['react', 'React'],
-  ['nextdotjs', 'Next.js'],
-  ['typescript', 'TypeScript'],
-] as const;
+const NAME_DUR = 0.4;
 
 /** The page's orange and its ink, as GL colours. The field resolves to ink
-    because the reel lands on paper. */
-const SIGNAL = [1, 90 / 255, 31 / 255] as const;
-const INK = 17 / 255;
+    because the reel lands on white. */
+const SIGNAL = [1, 91 / 255, 20 / 255] as const;
+const INK = 13 / 255;
+
+/** The palette the work boxes snap in as, before their screenshots arrive. */
+const BOX_COLORS = ['var(--orange)', 'var(--pink)', 'var(--teal)'];
 
 /* Grid placements as [column, span, row, span], 1-based. Each layout tiles
    its grid completely; B is A after a "breakpoint", so the reflow moves every
@@ -120,8 +117,6 @@ type Morph = {
   delay: Float32Array;
   arc: Float32Array;
   flash: Float32Array;
-  /** Where surplus particles go: back into orbit, or out of the frame. */
-  surplus: 'dust' | 'fade';
 };
 
 type Field = {
@@ -258,18 +253,21 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
   const boxes = works.map((work, i) => {
     const box = make('reel-box');
     place(box, rectsA[i]);
+    box.style.setProperty('--c', BOX_COLORS[i % BOX_COLORS.length]);
     const fill = make('reel-box-fill', box);
+    let face: HTMLElement | null = null;
     if (work.image) {
       const img = make('reel-box-img', fill, 'img');
       img.alt = '';
       img.src = work.image.src;
+      face = img;
     } else {
       fill.classList.add('is-plate');
       make('reel-box-plate', fill).textContent = work.title;
     }
     const tag = make('reel-box-tag', box);
     tag.textContent = work.title;
-    return { box, fill, tag };
+    return { box, fill, face, tag };
   });
 
   /** A title card that solves its own width so the word spans `length` exactly. */
@@ -317,12 +315,6 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
   }
   systems.el.classList.add('is-reversed');
 
-  const captions = MARKS.map(([, label]) => {
-    const el = make('reel-caption');
-    el.textContent = label;
-    return el;
-  });
-
   const hud = make('reel-hud');
   hud.textContent = timecode(0);
 
@@ -332,12 +324,6 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
   // whose context was lost cannot hand out another one for a replay.
   const layer: PointLayer = createPointLayer(make('reel-canvas', stage, 'canvas'));
   layer.resize(W, H);
-
-  const markSide = tall ? W * 0.62 : Math.min(W, H) * 0.44;
-  const markTop = cy - markSide / 2 - (tall ? 24 : 18);
-  captions.forEach((el) => {
-    el.style.top = `${markTop + markSide + (tall ? 22 : 26)}px`;
-  });
 
   const build = (): Field => {
     const rand = mulberry32(0x4b4e4f45);
@@ -402,59 +388,12 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
       f.lag[i] = rand() * 0.1;
     }
 
-    /* Marks, assigned in angular order so the swirl spirals into each shape
-       instead of crossing itself. Live particles are spread evenly through
-       that order, which spreads the leftover dust evenly around the ring. */
-    const order = Array.from({ length: count }, (_, i) => i).sort(
-      (a, b) =>
-        ((f.angle[a] + f.speed[a] * (T.marks[0] - T.orbit)) % (Math.PI * 2)) -
-        ((f.angle[b] + f.speed[b] * (T.marks[0] - T.orbit)) % (Math.PI * 2))
-    );
-    const GRID = 46;
-    const markCell = markSide / GRID;
-    const left = cx - markSide / 2;
-
-    MARKS.forEach(([slug], k) => {
-      const cells = cellsOf(
-        GRID,
-        GRID,
-        (ctx) => {
-          const s = GRID / 24;
-          ctx.setTransform(s, 0, 0, s, 0, 0);
-          ctx.fill(new Path2D(MARK_PATHS[slug]));
-        },
-        Math.floor(count * 0.92)
-      );
-      const n = cells.length / 2;
-      const byAngle = Array.from({ length: n }, (_, j) => j).sort((a, b) => {
-        const aa = Math.atan2(cells[a * 2 + 1] - GRID / 2, cells[a * 2] - GRID / 2);
-        const bb = Math.atan2(cells[b * 2 + 1] - GRID / 2, cells[b * 2] - GRID / 2);
-        return aa - bb;
-      });
-      const m = morph(count, T.marks[k], MARK_DUR, markCell * 0.9, 'dust');
-      let next = 0;
-      for (let j = 0; j < count && next < n; j++) {
-        if (Math.floor(((j + 1) * n) / count) <= next) continue;
-        const p = order[j];
-        const c = byAngle[next++];
-        m.live[p] = 1;
-        m.tx[p] = left + (cells[c * 2] + 0.5) * markCell;
-        m.ty[p] = markTop + (cells[c * 2 + 1] + 0.5) * markCell;
-      }
-      for (let p = 0; p < count; p++) {
-        m.delay[p] = (m.ty[p] / H) * 0.025 + rand() * 0.02;
-        m.arc[p] = (rand() * 2 - 1) * markCell * 4;
-        m.flash[p] = rand() < 0.5 ? 1 : 0.25;
-      }
-      f.morphs.push(m);
-    });
-
     /* The name: rasterised where the hero sets it, at whatever cell size lets
        the field cover it, and filled left to right. */
     const target = nameTargets(count);
     if (target) {
       f.nameBox = target.box;
-      const m = morph(count, T.name, NAME_DUR, target.cell * 0.94, 'fade');
+      const m = morph(count, T.name, NAME_DUR, target.cell * 0.94);
       const at = new Float32Array(count);
       const probe = new Float32Array(STRIDE);
       for (let p = 0; p < count; p++) {
@@ -486,17 +425,10 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
     return f;
   };
 
-  const morph = (
-    count: number,
-    start: number,
-    dur: number,
-    size: number,
-    surplus: Morph['surplus']
-  ): Morph => ({
+  const morph = (count: number, start: number, dur: number, size: number): Morph => ({
     start,
     dur,
     size,
-    surplus,
     tx: new Float32Array(count),
     ty: new Float32Array(count),
     live: new Uint8Array(count),
@@ -628,16 +560,8 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
         r += (SIGNAL[0] - r) * flash;
         g += (SIGNAL[1] - g) * flash;
         b += (SIGNAL[2] - b) * flash;
-      } else if (m.surplus === 'dust') {
-        const radius = f.radius[i] * 1.25 + markSide * 0.18;
-        x += (cx + cos * radius - x) * e;
-        y += (cy + sin * radius * 0.86 - y) * e;
-        s += (2 - s) * e;
-        a += (0.32 - a) * e;
-        r += (INK - r) * e;
-        g += (INK - g) * e;
-        b += (INK - b) * e;
       } else {
+        // No place in the name: out of the frame along the line it is on.
         const dx = x - cx;
         const dy = y - cy;
         const d = Math.hypot(dx, dy) || 1;
@@ -734,15 +658,18 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
     { scaleY: 1, duration: 0.42, stagger: { each: tall ? 0.05 : 0.022, from: 'center' } },
     T.grid
   );
-  // The lines were drawn white on night; once the paper is down they are
-  // ruled in ink instead.
-  tl.to(vlines, { backgroundColor: 'rgba(17,17,17,0.14)', duration: 0.3 }, T.flood + 0.1);
+  // The orange floods in under "Interfaces" and drains back out the way it
+  // came, column by column, as the boxes arrive on the white.
   floods.forEach((el, i) => {
     tl.fromTo(
       el,
       { scaleY: 0, transformOrigin: i % 2 ? '50% 100%' : '50% 0%' },
       { scaleY: 1, duration: 0.36, ease: 'expo.inOut' },
       T.flood + i * (tall ? 0.05 : 0.018)
+    ).to(
+      el,
+      { scaleY: 0, duration: 0.32, ease: 'expo.inOut' },
+      T.drain + i * (tall ? 0.04 : 0.014)
     );
   });
 
@@ -758,11 +685,12 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
     T.card1Out
   );
 
-  // 4. The work: each box snaps out from its corner and its screenshot wipes in.
-  boxes.forEach(({ box, fill, tag }, i) => {
+  // 4. The work: each box snaps out from its corner as a block of colour, and
+  // its screenshot wipes in over the colour.
+  boxes.forEach(({ box, fill, face, tag }, i) => {
     const at = T.boxes + i * 0.05;
     const r = rectsA[i];
-    // A zero-size box would still draw its outline as a dot.
+    // A zero-size box would still paint as a dot.
     tl.set(box, { visibility: 'visible' }, at)
       .fromTo(
         box,
@@ -774,9 +702,17 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
         fill,
         { clipPath: 'inset(0 100% 0 0)' },
         { clipPath: 'inset(0 0% 0 0)', duration: 0.3, ease: 'expo.inOut' },
-        at + 0.06
+        at + 0.04
       )
       .fromTo(tag, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'none' }, at + 0.14);
+    if (face) {
+      tl.fromTo(
+        face,
+        { clipPath: 'inset(0 100% 0 0)' },
+        { clipPath: 'inset(0 0% 0 0)', duration: 0.3, ease: 'expo.inOut' },
+        at + 0.16
+      );
+    }
   });
 
   // 5. A breakpoint: every box reflows to a new layout at once.
@@ -810,16 +746,7 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
     T.card2Out
   );
 
-  // 8. The stack, one cut per mark.
-  captions.forEach((el, k) => {
-    tl.fromTo(el, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.14 }, T.marks[k] + 0.1).to(
-      el,
-      { opacity: 0, duration: 0.06, ease: 'none' },
-      (T.marks[k + 1] ?? T.name) + 0.02
-    );
-  });
-
-  // 9. The name resolves into the page's own type, and the page arrives.
+  // 8. The name resolves into the page's own type, and the page arrives.
   if (nameEl) tl.to(nameEl, { opacity: 1, duration: 0.2, ease: 'power2.out' }, T.resolve);
   tl.set(root, { backgroundColor: 'transparent' }, T.handoff - 0.02)
     .set(floods, { opacity: 0 }, T.handoff - 0.02)

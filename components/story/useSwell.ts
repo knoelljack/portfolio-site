@@ -4,13 +4,14 @@ import { useEffect, type RefObject } from 'react';
 
 /**
  * Letters (`.ch`) inside `ref` swell along the width axis toward the pointer —
- * or a finger dragged across them — while the rest of their line gives up
- * exactly the width they take, so a fitted line never leaves its box. Each
- * letter's growth is weighted by its own width, which tracks its advance per
- * unit of wdth closely enough to hold the line to a pixel.
+ * or a finger dragged across them — while the rest of their line gives up the
+ * width they take, so a fitted line never leaves its box. Each letter's growth
+ * is weighted by its width, which tracks its advance per unit of wdth closely
+ * enough to hold the line to a pixel.
  *
- * `area` is the closest ancestor matching the selector: the region the pointer
- * is read over.
+ * Positions are read in viewport terms each time a pointer arrives at rest:
+ * on the story's sticky stage a letter's place on screen and its place in the
+ * document part ways as soon as the page scrolls.
  */
 export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amount: number) {
   useEffect(() => {
@@ -27,13 +28,10 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
     let line: number[] = [];
     let lines = 0;
     let height = 1;
+    let measured = false;
     let pointer: { x: number; y: number } | null = null;
     let raf = 0;
 
-    // Measured in viewport terms each time a pointer arrives, at rest: the
-    // hero sits on a sticky stage, where a letter's place on screen and its
-    // place in the document part ways as soon as the page scrolls.
-    let measured = false;
     const measure = () => {
       for (const l of letters) l.style.removeProperty('--wd');
       base = letters.map((l) => parseFloat(getComputedStyle(l).getPropertyValue('--wd')) || 100);
@@ -53,9 +51,10 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
       raf = 0;
       const goal = base.slice();
       if (pointer) {
+        const p = pointer;
         const pull = letters.map((_, i) => {
-          const dx = (cx[i] - pointer!.x) / (height * 0.9);
-          const dy = (cy[i] - pointer!.y) / (height * 1.4);
+          const dx = (cx[i] - p.x) / (height * 0.9);
+          const dy = (cy[i] - p.y) / (height * 1.4);
           return Math.exp(-dx * dx - dy * dy);
         });
         for (let k = 0; k < lines; k++) {
@@ -104,7 +103,6 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
     const onScroll = () => {
       if (!raf) measured = false;
     };
-
     const ro = new ResizeObserver(() => {
       cancelAnimationFrame(raf);
       raf = 0;
@@ -112,6 +110,7 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
       for (const l of letters) l.style.removeProperty('--wd');
       measured = false;
     });
+
     ro.observe(root);
     region.addEventListener('pointermove', onMove);
     region.addEventListener('pointerleave', onLeave);

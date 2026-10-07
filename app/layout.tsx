@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Instrument_Sans, JetBrains_Mono, Science_Gothic } from 'next/font/google';
 import './globals.css';
-import { Nav } from '@/components/sections/Nav';
+import { Menu } from '@/components/story/Menu';
 import { Reel } from '@/components/reel/Reel';
 
 const display = Science_Gothic({
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f4f4f4',
+  themeColor: '#ffffff',
 };
 
 /**
@@ -87,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             ))}
           </div>
         </div>
-        <Nav />
+        <Menu />
         <main className="relative z-10">{children}</main>
       </body>
     </html>

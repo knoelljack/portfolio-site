@@ -1,22 +1,18 @@
 import { Story } from '@/components/story/Story';
-import { Hero } from '@/components/sections/Hero';
-import { WorkSection } from '@/components/sections/WorkSection';
-import { AboutSection } from '@/components/sections/AboutSection';
-import { ContactSection } from '@/components/sections/ContactSection';
-import { Footer } from '@/components/sections/Footer';
+import { NameBeat } from '@/components/story/NameBeat';
+import { WorkBeat } from '@/components/story/WorkBeat';
+import { SystemsBeat } from '@/components/story/SystemsBeat';
+import { Contact } from '@/components/story/Contact';
 
 export default function Home() {
   return (
     <>
       <Story>
-        <Hero />
-        <WorkSection />
-        <AboutSection />
+        <NameBeat />
+        <WorkBeat />
+        <SystemsBeat />
       </Story>
-      <div className="sheet">
-        <ContactSection />
-        <Footer />
-      </div>
+      <Contact />
     </>
   );
 }

@@ -4,332 +4,303 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * The page after the reel: one scrubbed timeline over a sticky stage.
+ * The page after the reel: one scrubbed timeline over a sticky stage, told
+ * in screens of scroll and snapped to each beat's rest.
  *
- *   hero → the orange pixel opens in the "o" of the name, the name parts
- *   around it, and the pixel flies out to become the first project's frame →
- *   seven projects, each building over the last in five columns while its
- *   title grows into its box → the last frame lifts off and lightens into
- *   the stack's stage → the scroll scrubs through every technology on it →
- *   the contact sheet slides up over the lot.
+ *   name → the pixel at the end of the lede grows into a field while the name
+ *   rises away and "Interfaces" squeezes in across it (the reel's own card
+ *   move) → the field reflows into each of seven posters in turn, mirrored
+ *   every time — the reel's breakpoint — while the card snaps out of its
+ *   corner and each screenshot wipes over the last → the field folds into the
+ *   base of a tower, the rest of the stack drops onto it and "Systems" grows
+ *   in → the contact cover rises in columns, the reel's flood.
  *
- * Time on the timeline is measured in screens of scroll, so a beat's position
- * reads directly as "how far down". Nothing here renders until the reader
- * scrolls past a beat, so building it under the reel disturbs nothing.
+ * Every exit is the next beat's entrance: the field is never hidden between
+ * beats, it only changes shape and colour.
  */
 
 export type StoryControls = { kill: () => void };
 
-/** The beats, in screens. Project k builds at `stepAt(k)` and is fully on
-    screen at `shownAt(k)`; the stack takes over at `ABOUT`. */
-const PIXEL_IN = 0.15;
-const PART = 0.35;
-const FLY = 0.45;
-const WORK_IN = 0.95;
-const FIRST = 1.05;
-const WORK = 1.5;
-const HOLD = 0.5;
-const STEP = 0.9;
-const BUILD = 0.4;
-const stepAt = (k: number) => (k === 0 ? FIRST : WORK + HOLD + (k - 1) * STEP);
-const shownAt = (k: number) => (k === 0 ? WORK : stepAt(k) + BUILD);
+/** Rests, in screens. Poster k rests at `posterAt(k)`; the fold into the
+    tower takes a longer move than a reflow. */
+const WORK = 1;
+const FIRST = 2;
+const FOLD = 1.2;
+const posterAt = (k: number) => FIRST + k;
 
-const COLUMNS = ['--c0', '--c1', '--c2', '--c3', '--c4'] as const;
+/** How far a letter travels to be out of sight: past its own line box and
+    the descender room under it, which the mask keeps. */
+const HIDE = 145;
 
-export function createStory(track: HTMLElement): StoryControls {
+const SHOWN = 'inset(0% 0% 0% 0%)';
+const FOLDED = 'inset(0% 100% 100% 0%)';
+/** A screenshot waits clipped to nothing on the side it will wipe in from. */
+const FROM_LEFT = 'inset(0% 100% 0% 0%)';
+const FROM_RIGHT = 'inset(0% 0% 0% 100%)';
+
+type Rect = { x: number; y: number; w: number; h: number };
+
+export function createStory(track: HTMLElement, snapping = true): StoryControls {
   const html = document.documentElement;
   const one = <T extends Element = HTMLElement>(sel: string, root: ParentNode = track) =>
     root.querySelector<T>(sel)!;
   const all = <T extends Element = HTMLElement>(sel: string, root: ParentNode = track) =>
     Array.from(root.querySelectorAll<T>(sel));
 
-  const len = parseFloat(getComputedStyle(track).getPropertyValue('--story-len')) || 13;
+  const len = parseFloat(getComputedStyle(track).getPropertyValue('--story-len')) || 10.2;
   const stage = one('.stage');
-  const hero = one('.scene-hero');
-  const heroParts = [one('.hero-role'), one('.hero-lede'), one('.hero-actions')];
-  const letters = all('.hero-name .ch');
-  const work = one('.scene-work');
-  const head = one('.work-head');
-  const ticks = one('.work-ticks');
-  const marker = one('.work-marker');
-  const tickButtons = all<HTMLButtonElement>('.work-tick');
-  const projects = all('.project');
-  const about = one('.scene-about');
-  const lead = one('.about-lead-block');
-  const groups = all('.stack-group');
-  const stackStage = one('.stack-stage');
-  const caption = one('.stack-caption');
-  const names = all('.stack-name');
-  const techCount = names.length;
-  const pixel = one('.story-pixel');
-  const box = one('.story-box');
 
-  const LAST = projects.length - 1;
-  const ABOUT_OUT = shownAt(LAST) + HOLD;
-  const ABOUT = ABOUT_OUT + 1;
-  const SCRUB_END = len - 1;
-  /** The middle of technology `i`'s stretch of the scrub. */
-  const techAt = (i: number) => ABOUT + ((i + 0.5) * (SCRUB_END - ABOUT)) / techCount;
+  const nameBeat = one('.beat-name');
+  const role = one('.name-role');
+  const lede = one('.lede');
+  const pixel = one('.lede .pixel');
+  const cue = one('.name-cue');
+  const nameWords = all('.name-word');
 
-  const parts = projects.map((p) => ({
-    el: p,
-    lines: all('.fit-line', p),
-    chars: all('.fit-line .ch', p),
-    text: one('.project-text', p),
-    rest: [one('.project-meta', p), one('.project-summary', p), one('.project-link', p)],
-    frame: one('.frame', p),
-    layer: one('.shot-layer', p),
+  const ifSlot = one('.interfaces-field');
+  const ifChars = all('.interfaces-word .ch');
+  const ifLead = all('.interfaces-lead > span');
+
+  const parts = all('.poster').map((el) => ({
+    el,
+    slot: one('.poster-field', el),
+    cardSlot: one('.poster-card', el),
+    chars: all('.poster-title .ch', el),
+    rest: [one('.poster-meta', el), one('.poster-summary', el), one('.poster-link', el)],
+    color: getComputedStyle(el).getPropertyValue('--c').trim(),
   }));
+  const LAST = parts.length - 1;
+  const SYSTEMS = posterAt(LAST) + FOLD;
+
+  const field = one('.s-field');
+  const card = one('.s-card');
+  const cardTilt = one('.s-card-tilt');
+  const cardInner = one('.s-card-inner');
+  const layers = all('.s-layer');
+  const progress = one('.s-progress');
+  const squares = all<HTMLButtonElement>('.s-sq');
+  const marker = one('.s-marker');
+
+  const systems = one('.beat-systems');
+  const sysChars = all('.systems-word .ch');
+  const sysText = [one('.systems-lead'), one('.systems-rest')];
+  const bars = all('.bar');
+  const base = bars[bars.length - 1];
+  const upper = bars.slice(0, -1).reverse();
+
+  const coverChars = Array.from(document.querySelectorAll<HTMLElement>('.cover-word .ch'));
+  const orange = getComputedStyle(html).getPropertyValue('--orange').trim();
+
+  /** The width each fitted letter is solved to: its line's. */
+  const fitOf = (_: number, el: Element) =>
+    parseFloat(getComputedStyle(el.parentElement!).getPropertyValue('--wd')) || 100;
 
   // Everything the timeline writes to, and exactly which properties, so a
   // rebuild or a teardown clears only what it set — the server-rendered
-  // inline widths on the title lines have to survive it.
-  const CLEAR = 'transform,opacity,visibility,pointerEvents';
+  // custom properties on lines, posters and blocks have to survive it.
+  const MOVED = 'transform,opacity,visibility,pointerEvents';
   const resets: [gsap.TweenTarget, string][] = [
-    [[hero, ...heroParts, work, head, ticks, marker, about, ...Array.from(lead.children)], CLEAR],
-    [[...groups, stackStage, caption], CLEAR],
-    [letters, `${CLEAR},display`],
-    [projects, CLEAR],
-    [parts.flatMap((p) => [...p.lines, ...p.rest, p.text, p.frame]), CLEAR],
-    [parts.flatMap((p) => p.chars), `${CLEAR},--wd`],
-    [parts.map((p) => p.layer), COLUMNS.join(',')],
-    [[pixel, box], `${CLEAR},left,top,width,height,backgroundColor`],
+    [[nameBeat, role, lede, pixel, cue, ...nameWords, ...ifLead], MOVED],
+    [[...ifChars, ...sysChars, ...coverChars], `${MOVED},--wd,transformOrigin`],
+    [parts.flatMap((p) => [p.el, ...p.rest]), MOVED],
+    [parts.flatMap((p) => p.chars), `${MOVED},--wd`],
+    [[systems, ...sysText, ...bars, progress, marker], MOVED],
+    [[field, card], `${MOVED},width,height,backgroundColor`],
+    [[cardInner, ...layers], 'clipPath'],
   ];
 
   let tl: gsap.core.Timeline | null = null;
   let st: ScrollTrigger | null = null;
-  let scene: string | null | undefined;
-  let tech = -1;
+  let columns: HTMLElement[] = [];
 
-  /** Where the story is, read off the animation rather than the scrollbar,
-      so everything keyed to it moves with the smoothed playhead. */
-  const sync = () => {
-    if (!tl) return;
-    const t = tl.time();
-    const next = t < WORK_IN - 0.05 ? null : t < ABOUT_OUT + 0.4 ? 'work' : 'about';
-    if (next !== scene) {
-      scene = next;
-      window.dispatchEvent(new CustomEvent('story:scene', { detail: next }));
-    }
-    const index = Math.min(
-      techCount - 1,
-      Math.max(0, Math.floor(((t - ABOUT) / (SCRUB_END - ABOUT)) * techCount))
-    );
-    if (index !== tech) {
-      tech = index;
-      window.dispatchEvent(new CustomEvent('stack:scrub', { detail: index }));
-    }
-  };
+  const probe = document.createElement('div');
+  probe.style.cssText =
+    'position:absolute;top:0;left:0;width:1px;height:100svh;visibility:hidden;pointer-events:none';
+  document.body.appendChild(probe);
+  const svh = () => probe.offsetHeight || window.innerHeight;
 
   const build = () => {
     const sr = stage.getBoundingClientRect();
-    const local = (r: DOMRect) => ({
-      left: r.left - sr.left,
-      top: r.top - sr.top,
-      width: r.width,
-      height: r.height,
-    });
+    const rect = (el: Element): Rect => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height };
+    };
+    // The field is one screen-sized box moved and scaled from its corner, so
+    // every change of shape stays on the compositor.
+    const W = field.offsetWidth || 1;
+    const H = field.offsetHeight || 1;
+    const shape = (r: Rect) => ({ x: r.x, y: r.y, scaleX: r.w / W, scaleY: r.h / H });
 
-    // Synced from the timeline's own updates: with scrub smoothing the playhead
-    // keeps easing toward the scroll after the scroll itself has stopped.
-    tl = gsap.timeline({ paused: true, defaults: { ease: 'none' }, onUpdate: sync });
+    const pixelAt = rect(pixel);
+    const ifAt = rect(ifSlot);
+    const fieldAt = parts.map((p) => rect(p.slot));
+    const cardAt = parts.map((p) => rect(p.cardSlot));
+    const baseAt = rect(base);
+    const dropY = upper.map((el) => {
+      const r = rect(el);
+      return -(r.y + r.h + 40);
+    });
+    const pitch = squares.length > 1 ? squares[1].offsetLeft - squares[0].offsetLeft : 0;
+    columns = Array.from(document.querySelectorAll<HTMLElement>('.cover-col')).filter(
+      (c) => c.offsetParent !== null
+    );
+
+    /* ---------- where everything starts ---------- */
+
+    gsap.set(field, { ...shape(pixelAt), autoAlpha: 0, backgroundColor: orange });
+    gsap.set(card, {
+      width: cardAt[0].w,
+      height: cardAt[0].h,
+      x: cardAt[0].x,
+      y: cardAt[0].y,
+      autoAlpha: 0,
+    });
+    gsap.set(cardInner, { clipPath: FOLDED });
+    // Each screenshot waits on the side the field is leaving.
+    layers.forEach((l, i) => gsap.set(l, { clipPath: i === 0 || i % 2 ? FROM_LEFT : FROM_RIGHT }));
+    gsap.set(progress, { autoAlpha: 0 });
+    // A staggered tween applies its starting state to each target only when
+    // that target's own turn comes, so every starting state is set here.
+    gsap.set(ifChars, { yPercent: HIDE, '--wd': 200 });
+    gsap.set(ifLead, { opacity: 0, y: 20 });
+    for (const p of parts) {
+      gsap.set(p.el, { pointerEvents: 'none' });
+      gsap.set(p.chars, { yPercent: HIDE, '--wd': 50 });
+      gsap.set(p.rest, { opacity: 0, y: 16 });
+    }
+    gsap.set(systems, { pointerEvents: 'none' });
+    gsap.set(sysChars, { '--wd': 50, scaleY: 0, transformOrigin: '50% 70%' });
+    gsap.set(sysText, { opacity: 0, y: 18 });
+    gsap.set(bars, { opacity: 0 });
+    // A wave from the left: each column of the cover lags the one before.
+    columns.forEach((c, i) =>
+      gsap.set(c, { yPercent: 8 + (42 * i) / Math.max(1, columns.length - 1) })
+    );
+    gsap.set(coverChars, { yPercent: HIDE, '--wd': 50 });
+
+    tl = gsap.timeline({ paused: true, defaults: { ease: 'none' }, onUpdate: () => lean() });
     tl.set({}, {}, len);
 
-    /* ---------- hero out: the name parts around the pixel ---------- */
+    /* ---------- name → interfaces: the pixel becomes the field ---------- */
 
-    // The hero's own elements are revealed by the reel, so nothing here may
-    // touch them before the reader scrolls: explicit from-values, rendered
-    // only once the playhead reaches them.
+    tl.set(field, { autoAlpha: 1 }, 0.001).set(pixel, { opacity: 0 }, 0.001);
+    // The name's parts are revealed by the reel, so nothing here may touch
+    // them before the reader scrolls: explicit from-values, rendered only once
+    // the playhead reaches them.
     tl.fromTo(
-      heroParts,
+      [role, lede, cue],
       { y: 0, opacity: 1 },
       {
-        y: -36,
+        y: -28,
         opacity: 0,
-        duration: 0.35,
-        stagger: 0.06,
+        duration: 0.28,
+        stagger: 0.04,
         ease: 'power2.in',
         immediateRender: false,
       },
       0.02
     );
-
-    const o = letters.find((l) => l.textContent === 'o') ?? letters[Math.floor(letters.length / 2)];
-    const or = o.getBoundingClientRect();
-    const size = parseFloat(getComputedStyle(o).fontSize);
-    // An inline box's top is its baseline less the face's ascent (1.09em in
-    // Science Gothic); the counter's middle is half an x-height (0.51em) up.
-    const ox = or.left + or.width / 2 - sr.left;
-    const oy = or.top + size * (1.09 - 0.255) - sr.top;
-    const dot = Math.max(6, size * 0.12);
-
-    gsap.set(pixel, {
-      left: ox - dot / 2,
-      top: oy - dot / 2,
-      width: dot,
-      height: dot,
-      autoAlpha: 0,
-    });
     tl.fromTo(
-      pixel,
-      { autoAlpha: 1, scale: 0 },
-      { scale: 1, duration: 0.18, ease: 'back.out(2.2)', immediateRender: false },
-      PIXEL_IN
+      nameWords,
+      { yPercent: 0 },
+      { yPercent: -112, duration: 0.32, stagger: 0.07, ease: 'power3.in', immediateRender: false },
+      0.06
     );
-
-    const reach = window.innerWidth * 0.55;
-    // Letters only take a transform as inline blocks, which drops the kerning
-    // the fitted line was solved with — so they switch only as they start to
-    // move, and switch back if the reader scrolls back to the top.
-    tl.set(letters, { display: 'inline-block' }, PART);
+    tl.set(nameBeat, { pointerEvents: 'none' }, 0.3);
     tl.fromTo(
-      letters,
-      { x: 0, scale: 1, opacity: 1 },
-      {
-        x: (_: number, el: Element) => {
-          const r = el.getBoundingClientRect();
-          const dx = r.left + r.width / 2 - sr.left - ox;
-          return Math.abs(dx) < 2 ? 0 : Math.sign(dx) * (reach + Math.abs(dx) * 0.6);
-        },
-        scale: (_: number, el: Element) => (el === o ? 1.6 : 1),
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.in',
-        stagger: { each: 0.012, from: letters.indexOf(o) },
-        immediateRender: false,
-      },
-      PART
+      field,
+      shape(pixelAt),
+      { ...shape(ifAt), duration: 0.62, ease: 'expo.inOut', immediateRender: false },
+      0.1
     );
-    tl.set(hero, { opacity: 0, pointerEvents: 'none' }, PART + 0.75);
-
-    /* ---------- the pixel becomes the first frame ---------- */
-
-    const fr = local(parts[0].frame.getBoundingClientRect());
-    tl.to(pixel, { ...fr, duration: 0.6, ease: 'power3.inOut' }, FLY);
-
-    // Hidden by opacity, never visibility: a hidden layer's links would drop
-    // out of the tab order, and focus is how a keyboard reader gets to them.
-    gsap.set(work, { opacity: 0, pointerEvents: 'none' });
-    tl.set(work, { opacity: 1, pointerEvents: 'auto' }, WORK_IN);
-    tl.fromTo(head, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.25 }, WORK_IN);
-    tl.fromTo(ticks, { opacity: 0 }, { opacity: 1, duration: 0.2 }, WORK_IN + 0.05);
-
-    /* ---------- the projects, each built over the last ---------- */
-
-    const pitch =
-      tickButtons.length > 1 ? tickButtons[1].offsetLeft - tickButtons[0].offsetLeft : 0;
-    gsap.set(projects, { opacity: 0, pointerEvents: 'none' });
-    // A staggered tween only applies its from-values to each target when that
-    // target's own turn comes, so every staggered starting state is set here:
-    // otherwise a title's second line sits in place until its turn, and the
-    // later letters flash at full width before shrinking to begin.
-    for (const p of parts) {
-      gsap.set(p.lines, { yPercent: 135 });
-      gsap.set(p.chars, { '--wd': 50 });
-      gsap.set(p.rest, { opacity: 0, y: 14 });
-    }
-
-    parts.forEach((p, k) => {
-      const t = stepAt(k);
-      tl!.set(p.el, { opacity: 1, pointerEvents: 'auto' }, t);
-      COLUMNS.forEach((c, j) => {
-        tl!.fromTo(
-          p.layer,
-          { [c]: '0%' },
-          { [c]: '100%', duration: 0.26, ease: 'power2.inOut' },
-          t + 0.04 + j * 0.035
-        );
-      });
-      // The outgoing title has left by the time this one rises into its place.
-      const textAt = k === 0 ? t + 0.08 : t + 0.16;
-      // Lines travel well past their own height: the line box is tight, and a
-      // descender would otherwise still hang inside the mask.
-      tl!.fromTo(
-        p.lines,
-        { yPercent: 135 },
-        { yPercent: 0, duration: 0.24, stagger: 0.05, ease: 'power3.out' },
-        textAt
-      );
-      tl!.fromTo(
-        p.chars,
-        { '--wd': 50 },
-        {
-          '--wd': (_: number, el: Element) =>
-            parseFloat(getComputedStyle(el.parentElement!).getPropertyValue('--wd')) || 100,
-          duration: 0.28,
-          stagger: 0.008,
-          ease: 'power2.out',
-        },
-        textAt
-      );
-      tl!.fromTo(
-        p.rest,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.18, stagger: 0.04, ease: 'power2.out' },
-        textAt + 0.06
-      );
-      if (k > 0) {
-        tl!.to(marker, { x: k * pitch, duration: 0.3, ease: 'power2.inOut' }, t);
-        leave(parts[k - 1], t);
-      }
-    });
-    // Gone the moment the first screenshot is whole, before "work" — where a
-    // deep link lands — so a tilted frame never shows orange round its edge.
-    tl.set(pixel, { autoAlpha: 0 }, FIRST + 0.44);
-
-    function leave(p: (typeof parts)[number], t: number) {
-      tl!.to(p.lines, { yPercent: -135, duration: 0.16, stagger: 0.03, ease: 'power2.in' }, t);
-      tl!.to(p.chars, { '--wd': 50, duration: 0.16, stagger: 0.005, ease: 'power2.in' }, t);
-      tl!.to(p.rest, { opacity: 0, y: -10, duration: 0.1, stagger: 0.02 }, t);
-      tl!.set(p.text, { opacity: 0 }, t + 0.22);
-      tl!.set(p.el, { opacity: 0, pointerEvents: 'none' }, t + 0.45);
-    }
-
-    /* ---------- the last frame becomes the stack's stage ---------- */
-
-    leave(parts[LAST], ABOUT_OUT);
-    tl.to([head, ticks], { opacity: 0, y: -10, duration: 0.2 }, ABOUT_OUT);
-
-    // The last frame — Drive Stories' night plate — lifts off whole and
-    // lightens into the stage on its way across.
-    gsap.set(about, { opacity: 0, pointerEvents: 'none' });
-    gsap.set(Array.from(lead.children), { opacity: 0, y: 18 });
-    gsap.set(groups, { opacity: 0, y: 12 });
-    const stageAt = local(stackStage.getBoundingClientRect());
-    gsap.set(box, { ...fr, autoAlpha: 0, backgroundColor: '#0b0b0b' });
-    tl.set(box, { autoAlpha: 1 }, ABOUT_OUT + 0.05);
-    tl.set(parts[LAST].frame, { opacity: 0 }, ABOUT_OUT + 0.05);
-    tl.to(box, { ...stageAt, duration: 0.6, ease: 'power3.inOut' }, ABOUT_OUT + 0.15);
     tl.to(
-      box,
-      { backgroundColor: '#fbfbfb', duration: 0.4, ease: 'power1.inOut' },
-      ABOUT_OUT + 0.3
+      ifChars,
+      { yPercent: 0, '--wd': fitOf, duration: 0.36, stagger: 0.016, ease: 'expo.out' },
+      0.46
     );
-    tl.set(work, { opacity: 0, pointerEvents: 'none' }, ABOUT_OUT + 0.5);
-    tl.set(about, { opacity: 1, pointerEvents: 'auto' }, ABOUT_OUT + 0.4);
-    tl.fromTo(
-      Array.from(lead.children),
-      { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.25, stagger: 0.06, ease: 'power2.out' },
-      ABOUT_OUT + 0.45
-    );
-    tl.fromTo(
-      groups,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.2, stagger: 0.04, ease: 'power2.out' },
-      ABOUT_OUT + 0.55
-    );
-    tl.fromTo(
-      [stackStage, caption],
-      { opacity: 0 },
-      { opacity: 1, duration: 0.2 },
-      ABOUT_OUT + 0.72
-    );
-    tl.set(box, { autoAlpha: 0 }, ABOUT_OUT + 0.95);
+    tl.to(ifLead, { opacity: 1, y: 0, duration: 0.24, stagger: 0.06, ease: 'power2.out' }, 0.68);
 
-    // The last screen is the contact sheet sliding up; the stack sinks back a
-    // little beneath it, so the curtain reads as passing in front.
-    tl.to(about, { scale: 0.94, y: () => -0.04 * svh(), duration: 1, ease: 'power1.in' }, len - 1);
+    /* ---------- interfaces → the first poster ---------- */
+
+    tl.to(
+      ifChars,
+      { yPercent: -HIDE, duration: 0.2, stagger: 0.008, ease: 'expo.in' },
+      WORK + 0.02
+    );
+    tl.to(ifLead, { opacity: 0, y: -16, duration: 0.14 }, WORK + 0.02);
+    move(fieldAt[0], parts[0].color, WORK + 0.08);
+    // The card snaps out of its corner, as the reel's boxes do, and its
+    // screenshot wipes in after it.
+    tl.set(card, { autoAlpha: 1 }, WORK + 0.34);
+    tl.to(cardInner, { clipPath: SHOWN, duration: 0.3, ease: 'expo.out' }, WORK + 0.34);
+    tl.to(layers[0], { clipPath: SHOWN, duration: 0.32, ease: 'expo.inOut' }, WORK + 0.44);
+    enter(0, WORK + 0.56);
+    tl.to(progress, { autoAlpha: 1, duration: 0.2 }, WORK + 0.6);
+
+    /* ---------- poster to poster: the breakpoint ---------- */
+
+    for (let k = 0; k < LAST; k++) {
+      const t = posterAt(k);
+      leave(k, t + 0.02);
+      move(fieldAt[k + 1], parts[k + 1].color, t + 0.08);
+      tl.to(
+        card,
+        { x: cardAt[k + 1].x, y: cardAt[k + 1].y, duration: 0.62, ease: 'expo.inOut' },
+        t + 0.08
+      );
+      tl.to(layers[k + 1], { clipPath: SHOWN, duration: 0.34, ease: 'expo.inOut' }, t + 0.3);
+      tl.to(marker, { x: (k + 1) * pitch, duration: 0.4, ease: 'power2.inOut' }, t + 0.12);
+      enter(k + 1, t + 0.56);
+    }
+
+    /* ---------- the last poster → the stack ---------- */
+
+    const fold = posterAt(LAST);
+    leave(LAST, fold + 0.02);
+    tl.to(progress, { autoAlpha: 0, duration: 0.16 }, fold + 0.04);
+    tl.to(cardInner, { clipPath: FOLDED, duration: 0.22, ease: 'expo.in' }, fold + 0.08);
+    tl.set(card, { autoAlpha: 0 }, fold + 0.3);
+    move(baseAt, getComputedStyle(base).getPropertyValue('--c').trim(), fold + 0.14, 0.56);
+    tl.set(systems, { pointerEvents: 'auto' }, fold + 0.5);
+    // The field lands exactly on the foundation block and hands over to it.
+    tl.set(base, { opacity: 1 }, fold + 0.7).set(field, { autoAlpha: 0 }, fold + 0.7);
+    tl.fromTo(
+      upper,
+      { opacity: 1, y: (i: number) => dropY[i] },
+      { y: 0, duration: 0.3, stagger: 0.06, ease: 'expo.out', immediateRender: false },
+      fold + 0.6
+    );
+    tl.to(
+      sysChars,
+      {
+        '--wd': fitOf,
+        scaleY: 1,
+        duration: 0.32,
+        stagger: { each: 0.014, from: 'center' },
+        ease: 'expo.out',
+      },
+      fold + 0.5
+    );
+    tl.to(
+      sysText,
+      { opacity: 1, y: 0, duration: 0.24, stagger: 0.06, ease: 'power2.out' },
+      fold + 0.8
+    );
+
+    /* ---------- the stack → contact: the cover floods up ---------- */
+
+    // Everything ends by `len`: a tween running past it would stretch the
+    // timeline, and every rest, anchor and snap would land a little late.
+    tl.to(columns, { yPercent: 0, duration: len - SYSTEMS }, SYSTEMS);
+    tl.to(
+      coverChars,
+      { yPercent: 0, '--wd': fitOf, duration: 0.22, stagger: 0.008, ease: 'expo.out' },
+      len - 0.4
+    );
+
+    tl.addLabel('name', 0).addLabel('work', WORK);
+    parts.forEach((_, k) => tl!.addLabel(`p${k}`, posterAt(k)));
+    tl.addLabel('about', SYSTEMS).addLabel('end', len);
 
     st = ScrollTrigger.create({
       trigger: track,
@@ -339,14 +310,58 @@ export function createStory(track: HTMLElement): StoryControls {
       // stage's release whatever the address bar is doing.
       end: () => `+=${len * svh()}`,
       animation: tl,
-      scrub: 0.5,
+      scrub: 0.6,
+      // Let go and the story glides on to the next beat's rest: the reader
+      // is carried from beat to beat rather than left between two.
+      // Without inertia: a flick carries the reader one beat on from where it
+      // comes to rest, never several beats past what they chose.
+      snap: snapping
+        ? {
+            snapTo: 'labelsDirectional',
+            duration: { min: 0.3, max: 0.9 },
+            delay: 0.06,
+            ease: 'power3.inOut',
+            inertia: false,
+          }
+        : undefined,
       // No invalidateOnRefresh: it reverts the timeline on every refresh —
       // including the one on window load — which wipes the starting states
-      // set above. Layout-dependent values are rebuilt on resize instead, and
-      // a function `end` is re-measured on every refresh regardless.
-      onRefresh: sync,
+      // set above. Layout-dependent values are rebuilt on resize instead.
     });
-    sync();
+
+    /** The field reflows to `to` and takes `color` at the fastest point of
+        the move — a cut, as the reel cuts — rather than crossfading through
+        the colours between. */
+    function move(to: Rect, color: string, t: number, duration = 0.62) {
+      tl!.to(field, { ...shape(to), duration, ease: 'expo.inOut' }, t);
+      tl!.to(field, { backgroundColor: color, duration: 0.04 }, t + duration / 2 - 0.02);
+    }
+
+    function enter(k: number, t: number) {
+      const p = parts[k];
+      tl!.set(p.el, { pointerEvents: 'auto' }, t);
+      tl!.to(
+        p.chars,
+        { yPercent: 0, '--wd': fitOf, duration: 0.3, stagger: 0.012, ease: 'expo.out' },
+        t
+      );
+      tl!.to(
+        p.rest,
+        { opacity: 1, y: 0, duration: 0.2, stagger: 0.05, ease: 'power2.out' },
+        t + 0.08
+      );
+    }
+
+    function leave(k: number, t: number) {
+      const p = parts[k];
+      tl!.to(
+        p.chars,
+        { yPercent: -HIDE, '--wd': 50, duration: 0.18, stagger: 0.006, ease: 'power2.in' },
+        t
+      );
+      tl!.to(p.rest, { opacity: 0, y: -12, duration: 0.12, stagger: 0.02 }, t);
+      tl!.set(p.el, { pointerEvents: 'none' }, t + 0.18);
+    }
   };
 
   const teardownTimeline = () => {
@@ -355,36 +370,41 @@ export function createStory(track: HTMLElement): StoryControls {
     st = null;
     tl = null;
     for (const [targets, props] of resets) gsap.set(targets, { clearProps: props });
-    work.style.removeProperty('--rx');
-    work.style.removeProperty('--ry');
+    gsap.set(columns, { clearProps: 'transform' });
+    cardTilt.style.removeProperty('--rx');
+    cardTilt.style.removeProperty('--ry');
   };
 
-  /* ---------- getting around: nav, ticks, deep links, focus ---------- */
+  /* ---------- getting around: deep links, the menu, focus ---------- */
 
-  const probe = document.createElement('div');
-  probe.style.cssText =
-    'position:absolute;top:0;left:0;width:1px;height:100svh;visibility:hidden;pointer-events:none';
-  document.body.appendChild(probe);
-  const svh = () => probe.offsetHeight || window.innerHeight;
+  const yFor = (t: number) => (st ? st.start + (t / len) * (st.end - st.start) : 0);
 
-  const timeFor = (id: string) =>
-    id === 'top' ? 0 : id === 'work' ? shownAt(0) : id === 'about' ? ABOUT + 0.01 : null;
-
-  const scrollToTime = (t: number, smooth: boolean) => {
-    if (!st) return;
-    const y = st.start + (t / len) * (st.end - st.start);
-    window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'instant' });
+  /** Complete the scrub at once: a jump should land, not replay the story. */
+  const settle = () => {
+    ScrollTrigger.update();
+    st?.getTween()?.progress(1);
   };
 
-  // The scenes' ids move from their layers on the stage to anchors in the
-  // scroll track, each where its scene is on screen. A fragment — a nav link,
-  // a typed hash, back and forward — is then the browser's own scroll to the
-  // right place, with nothing to intercept.
-  const anchors = (['top', 'work', 'about'] as const).map((id) => {
+  const jumpTo = (t: number) => {
+    window.scrollTo({ top: yFor(t), behavior: 'instant' });
+    settle();
+  };
+
+  // The beats' ids move from their layers on the stage to anchors in the
+  // scroll track, each where its beat is at rest. A fragment — a menu link, a
+  // typed hash, back and forward — is then the browser's own scroll to the
+  // right place.
+  const anchors = (
+    [
+      ['top', 0],
+      ['work', WORK],
+      ['about', SYSTEMS],
+    ] as const
+  ).map(([id, t]) => {
     const layer = document.getElementById(id);
     const anchor = document.createElement('span');
     anchor.className = 'story-anchor';
-    anchor.style.top = `calc(${timeFor(id)} * 100svh)`;
+    anchor.style.top = `calc(${t} * 100svh)`;
     layer?.removeAttribute('id');
     anchor.id = id;
     track.appendChild(anchor);
@@ -392,68 +412,62 @@ export function createStory(track: HTMLElement): StoryControls {
   });
 
   const onClick = (e: MouseEvent) => {
-    const tick = e.target instanceof Element ? e.target.closest<HTMLElement>('.work-tick') : null;
-    if (tick) scrollToTime(shownAt(Number(tick.dataset.tick)), true);
+    const sq = e.target instanceof Element ? e.target.closest<HTMLElement>('.s-sq') : null;
+    if (!sq || !st) return;
+    window.scrollTo({ top: yFor(posterAt(Number(sq.dataset.sq))), behavior: 'smooth' });
   };
 
-  // A keyboard reader tabbing into a scene that is not on screen is carried
-  // to it, so focus never lands on something the stage is hiding.
+  // A keyboard reader tabbing to a project that is not on stage is carried to
+  // it, so focus never lands on something the stage is hiding.
   const onFocus = (e: FocusEvent) => {
     if (!tl || !(e.target instanceof Element) || !track.contains(e.target)) return;
-    const project = e.target.closest<HTMLElement>('.project');
-    const now = tl.time();
-    // A technology is carried to its own place in the scrub, so the scroll
-    // then agrees with the name that has focus instead of drawing another.
-    const name = e.target.closest('.stack-name');
-    if (name) {
-      const i = names.indexOf(name as HTMLElement);
-      // Past SCRUB_END the contact sheet is rising over the stack.
-      if (i !== tech || now < ABOUT - 0.05 || now > SCRUB_END) scrollToTime(techAt(i), false);
-      return;
-    }
-    const t = project
-      ? shownAt(Number(project.dataset.i))
-      : e.target.closest('.scene-about')
-        ? ABOUT + 0.01
-        : e.target.closest('.scene-hero')
-          ? 0
-          : null;
-    if (t === null) return;
-    const showing = project
-      ? Math.abs(now - t) < 0.3
-      : t === 0
-        ? now < 0.05
-        : now >= ABOUT - 0.2 && now <= SCRUB_END;
-    if (!showing) scrollToTime(t, false);
+    const poster = e.target.closest<HTMLElement>('.poster');
+    if (!poster) return;
+    const t = posterAt(Number(poster.dataset.i));
+    if (Math.abs(tl.time() - t) > 0.05) jumpTo(t);
   };
 
-  /* ---------- the frame leans toward the pointer ---------- */
+  /* ---------- the card leans toward the pointer ---------- */
 
   const tilt = { x: 0, y: 0, tx: 0, ty: 0, raf: 0 };
-  const lean = () => {
+  const onPosters = () => !!tl && tl.time() > WORK + 0.5 && tl.time() < posterAt(LAST) + 0.1;
+  const step = () => {
     tilt.x += (tilt.tx - tilt.x) * 0.12;
     tilt.y += (tilt.ty - tilt.y) * 0.12;
-    work.style.setProperty('--rx', `${tilt.x.toFixed(2)}deg`);
-    work.style.setProperty('--ry', `${tilt.y.toFixed(2)}deg`);
+    cardTilt.style.setProperty('--rx', `${tilt.x.toFixed(2)}deg`);
+    cardTilt.style.setProperty('--ry', `${tilt.y.toFixed(2)}deg`);
     const settled = Math.abs(tilt.tx - tilt.x) < 0.02 && Math.abs(tilt.ty - tilt.y) < 0.02;
-    tilt.raf = settled ? 0 : requestAnimationFrame(lean);
+    tilt.raf = settled ? 0 : requestAnimationFrame(step);
   };
-  const aim = (x: number, y: number) => {
-    tilt.tx = x;
-    tilt.ty = y;
-    if (!tilt.raf) tilt.raf = requestAnimationFrame(lean);
+  const wake = () => {
+    if (!tilt.raf) tilt.raf = requestAnimationFrame(step);
   };
-  const onPointer = (e: PointerEvent) => {
-    if (e.pointerType === 'mouse') {
-      aim(-(e.clientY / window.innerHeight - 0.5) * 8, (e.clientX / window.innerWidth - 0.5) * 12);
-    } else if (e.buttons && e.target instanceof Element && e.target.closest('.project-shot')) {
-      // A finger dragged across the frame tilts it; a vertical drag still
-      // scrolls, because the frame only claims horizontal panning.
-      const r = (e.target.closest('.project-shot') as HTMLElement).getBoundingClientRect();
-      aim(0, ((e.clientX - r.left) / r.width - 0.5) * 18);
+  function lean() {
+    if (!onPosters() && (tilt.tx || tilt.ty)) {
+      tilt.tx = 0;
+      tilt.ty = 0;
+      wake();
     }
+  }
+  const onPointer = (e: PointerEvent) => {
+    if (!onPosters()) return;
+    if (e.pointerType === 'mouse') {
+      tilt.tx = -(e.clientY / window.innerHeight - 0.5) * 8;
+      tilt.ty = (e.clientX / window.innerWidth - 0.5) * 12;
+    } else if (e.buttons && e.target instanceof Element && e.target.closest('.s-card')) {
+      // A finger dragged across the card tilts it; a vertical drag still
+      // scrolls, because the card only claims horizontal panning.
+      const r = card.getBoundingClientRect();
+      tilt.tx = 0;
+      tilt.ty = ((e.clientX - r.left) / r.width - 0.5) * 18;
+    } else return;
+    wake();
   };
-  const onRelease = () => aim(0, 0);
+  const onRelease = () => {
+    tilt.tx = 0;
+    tilt.ty = 0;
+    wake();
+  };
 
   /* ---------- lifecycle ---------- */
 
@@ -464,17 +478,19 @@ export function createStory(track: HTMLElement): StoryControls {
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
       // A phone's address bar coming and going changes the window's height
-      // but not `svh`, which every scene is laid out in — so that alone
+      // but not `svh`, which every beat is laid out in — so that alone
       // rebuilds nothing. A new width, or a window resized for real, does.
       if (window.innerWidth === width && svh() === small) return;
       width = window.innerWidth;
       small = svh();
-      const progress = st?.progress ?? 0;
+      const at = st?.progress ?? 0;
       teardownTimeline();
       build();
       ScrollTrigger.refresh();
-      if (st)
-        window.scrollTo({ top: st.start + progress * (st.end - st.start), behavior: 'instant' });
+      if (st) {
+        window.scrollTo({ top: st.start + at * (st.end - st.start), behavior: 'instant' });
+        settle();
+      }
     }, 180);
   };
 
@@ -487,32 +503,31 @@ export function createStory(track: HTMLElement): StoryControls {
 
   // The stage shows every screenshot in one place, so it wants all of them
   // now rather than whenever lazy loading would have judged them near.
-  for (const img of all<HTMLImageElement>('.project img')) img.loading = 'eager';
+  for (const img of all<HTMLImageElement>('.s-card img')) img.loading = 'eager';
 
   ScrollTrigger.config({ ignoreMobileResize: true });
   build();
   ScrollTrigger.refresh();
 
-  // A deep link is landed again here: one into the story was first scrolled
-  // to its layer before the anchors existed, and any other (the contact
-  // sheet) had its smooth fragment scroll frozen mid-flight when the refresh
-  // above recorded and restored the scroll position. Once more after load,
-  // in case the browser repeats its own fragment scroll — unless the reader
-  // has started scrolling for themselves.
-  const fragment = location.hash.slice(1);
-  const landing = fragment ? timeFor(fragment) : null;
-  const target = fragment && landing === null ? document.getElementById(fragment) : null;
+  // A deep link that arrived before the anchors did was scrolled to the
+  // beat's layer instead, so it is landed again here — and once more after
+  // load, in case the browser repeats its own fragment scroll — unless the
+  // reader has started scrolling for themselves.
+  const landing = location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
   let steered = false;
   const onInput = () => {
     steered = true;
   };
   const land = () => {
-    if (steered) return;
-    if (landing !== null && landing > 0) scrollToTime(landing, false);
-    else target?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (steered || !landing) return;
+    window.scrollTo({
+      top: landing.getBoundingClientRect().top + window.scrollY,
+      behavior: 'instant',
+    });
+    settle();
   };
   land();
-  if ((landing !== null && landing > 0) || target) {
+  if (landing) {
     window.addEventListener('load', land, { once: true });
     window.setTimeout(land, 400);
     for (const type of ['wheel', 'touchstart', 'keydown'] as const) {
@@ -522,10 +537,11 @@ export function createStory(track: HTMLElement): StoryControls {
 
   document.addEventListener('click', onClick);
   document.addEventListener('focusin', onFocus);
-  work.addEventListener('pointermove', onPointer);
-  work.addEventListener('pointerleave', onRelease);
-  work.addEventListener('pointerup', onRelease);
-  work.addEventListener('pointercancel', onRelease);
+  window.addEventListener('story:jump', settle);
+  stage.addEventListener('pointermove', onPointer);
+  stage.addEventListener('pointerleave', onRelease);
+  stage.addEventListener('pointerup', onRelease);
+  stage.addEventListener('pointercancel', onRelease);
   window.addEventListener('resize', onResize);
   motion.addEventListener('change', onMotion);
 
@@ -534,10 +550,11 @@ export function createStory(track: HTMLElement): StoryControls {
     cancelAnimationFrame(tilt.raf);
     document.removeEventListener('click', onClick);
     document.removeEventListener('focusin', onFocus);
-    work.removeEventListener('pointermove', onPointer);
-    work.removeEventListener('pointerleave', onRelease);
-    work.removeEventListener('pointerup', onRelease);
-    work.removeEventListener('pointercancel', onRelease);
+    window.removeEventListener('story:jump', settle);
+    stage.removeEventListener('pointermove', onPointer);
+    stage.removeEventListener('pointerleave', onRelease);
+    stage.removeEventListener('pointerup', onRelease);
+    stage.removeEventListener('pointercancel', onRelease);
     window.removeEventListener('resize', onResize);
     window.removeEventListener('load', land);
     for (const type of ['wheel', 'touchstart', 'keydown'] as const) {
