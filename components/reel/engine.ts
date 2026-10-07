@@ -56,7 +56,10 @@ const MARKS = [
   ['typescript', 'TypeScript'],
 ] as const;
 
-const SIGNAL = [1, 138 / 255, 61 / 255] as const;
+/** The page's orange and its ink, as GL colours. The field resolves to ink
+    because the reel lands on paper. */
+const SIGNAL = [1, 90 / 255, 31 / 255] as const;
+const INK = 17 / 255;
 
 /* Grid placements as [column, span, row, span], 1-based. Each layout tiles
    its grid completely; B is A after a "breakpoint", so the reflow moves every
@@ -599,9 +602,9 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
       x += (cx + cos * f.radius[i] - x) * e;
       y += (cy + sin * f.radius[i] * 0.86 - y) * e;
       const k = e * 0.6;
-      r += (1 - r) * k;
-      g += (1 - g) * k;
-      b += (1 - b) * k;
+      r += (INK - r) * k;
+      g += (INK - g) * k;
+      b += (INK - b) * k;
     }
 
     for (const m of f.morphs) {
@@ -617,9 +620,9 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
         x += dx * e + (-dy / len) * arc;
         y += dy * e + (dx / len) * arc;
         s += (m.size - s) * e;
-        r += (1 - r) * e;
-        g += (1 - g) * e;
-        b += (1 - b) * e;
+        r += (INK - r) * e;
+        g += (INK - g) * e;
+        b += (INK - b) * e;
         a += (1 - a) * e;
         const flash = Math.sin(Math.PI * u) ** 1.4 * m.flash[i] * 0.9;
         r += (SIGNAL[0] - r) * flash;
@@ -631,9 +634,9 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
         y += (cy + sin * radius * 0.86 - y) * e;
         s += (2 - s) * e;
         a += (0.32 - a) * e;
-        r += (1 - r) * e;
-        g += (1 - g) * e;
-        b += (1 - b) * e;
+        r += (INK - r) * e;
+        g += (INK - g) * e;
+        b += (INK - b) * e;
       } else {
         const dx = x - cx;
         const dy = y - cy;
@@ -731,6 +734,9 @@ export function createReel(root: HTMLElement, works: ReelWork[], onDone: () => v
     { scaleY: 1, duration: 0.42, stagger: { each: tall ? 0.05 : 0.022, from: 'center' } },
     T.grid
   );
+  // The lines were drawn white on night; once the paper is down they are
+  // ruled in ink instead.
+  tl.to(vlines, { backgroundColor: 'rgba(17,17,17,0.14)', duration: 0.3 }, T.flood + 0.1);
   floods.forEach((el, i) => {
     tl.fromTo(
       el,

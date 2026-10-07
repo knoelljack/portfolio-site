@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 @theme inline {
-  --color-background: var(--blue);
-  --color-foreground: var(--white);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
   --font-sans: var(--font-grotesk);
   --font-mono: var(--font-jetbrains);
 }
@@ -10,32 +10,30 @@
 /* ============================================================
    TOKENS
 
-   The ground is the accent: the ultramarine that used to be
-   spent on one button is now the whole page, with white type on
-   it. One orange square — the pixel — is the only other colour
-   outside the screenshots, and it is never used for words.
+   Paper, ink, one grey, and one orange square. The page stays
+   quiet so the scroll can do the talking; the orange is the
+   pixel — the reel's protagonist — and never carries words.
    ============================================================ */
 
 :root {
-  --blue: #3a2dff;
-  --blue-deep: #2a1fd6;
-  --night: #08061f;
-  --white: #ffffff;
-  /* 4.86:1 on --blue: the quieter half of the page's type, at any size. */
-  --haze: #d6d3ff;
-  /* Graphics only (2.98:1 on --blue). The pixel, and nothing with words. */
-  --signal: #ff8a3d;
+  --paper: #f4f4f4;
+  --paper-2: #e8e8e8;
+  --ink: #111111;
+  /* 4.64:1 on --paper. */
+  --grey: #6e6e6e;
+  /* 7.5:1 on --ink, for the contact sheet's quieter type. */
+  --grey-on-ink: #a3a3a3;
+  --night: #0b0b0b;
+  --signal: #ff5a1f;
 
-  --line: rgb(255 255 255 / 0.16);
-  --line-strong: rgb(255 255 255 / 0.4);
-  --hl: rgb(255 255 255 / 0.1);
+  --line: rgb(0 0 0 / 0.1);
+  --line-strong: rgb(0 0 0 / 0.24);
+  --hl: rgb(0 0 0 / 0.05);
 
   --pad: clamp(16px, 2.8vw, 40px);
   --nav-h: 3.5rem;
 
-  /* Snap: fast out of the gate, a long settle onto the grid. */
   --ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-swap: cubic-bezier(0.83, 0, 0.17, 1);
 }
 
 @layer base {
@@ -46,8 +44,9 @@
 
   /* The overflow guard lives on <html>, not <body>: on <body> it turns the
      element into a scroll container, which silently breaks every
-     `position: sticky` inside it. (`clip` would be the tidier fix, but
-     Lightning CSS downgrades it to `hidden` for our browser targets.)
+     `position: sticky` inside it — and the story's stage is sticky. (`clip`
+     would be the tidier fix, but Lightning CSS downgrades it to `hidden` for
+     our browser targets.)
 
      The gutter is reserved even while the reel holds scrolling off, so the
      page is the same width under the reel as after it — the hero's name is
@@ -57,13 +56,13 @@
     -webkit-text-size-adjust: 100%;
     overflow-x: hidden;
     scrollbar-gutter: stable;
-    background: var(--blue);
+    background: var(--paper);
   }
 
   body {
     margin: 0;
-    background: var(--blue);
-    color: var(--white);
+    background: var(--paper);
+    color: var(--ink);
     font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.5;
@@ -74,12 +73,12 @@
   }
 
   ::selection {
-    background: var(--white);
-    color: var(--blue);
+    background: var(--ink);
+    color: var(--paper);
   }
 
   :focus-visible {
-    outline: 2px solid var(--white);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
     border-radius: 2px;
   }
@@ -97,10 +96,10 @@
 /* ============================================================
    THE GRID
 
-   Twelve columns on a wide screen, four on a tall one. The lines
-   are the same lines the reel grows at the start, left standing
-   faintly behind the whole page. `.shell` is the content box they
-   rule, so every edge on the page lands on one of them.
+   Twelve columns on a wide screen, four on a tall one. The page
+   never draws it — the reel grows it at the start and retracts it
+   at the handoff — but the reel reads its lines from here, so the
+   grid it grows is the one every edge on the page sits on.
    ============================================================ */
 
 .shell {
@@ -111,7 +110,7 @@
 .grid-lines {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 
@@ -125,7 +124,6 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgb(255 255 255 / 0.07);
 }
 
 /* Thirteen lines at twelfths; a tall screen keeps every third, which is the
@@ -176,26 +174,20 @@
   }
 }
 
-/* Paper-grain over everything, the reel included, so the reel's ground and
-   the page's are the same material at the handoff. */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  pointer-events: none;
-  opacity: 0.32;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-}
-
 /* ============================================================
    TYPE
 
    Science Gothic for anything set to fill a box — its width axis
    runs from 50 to 200, which is what lets a line be solved to a
-   width. Instrument Sans for reading. JetBrains Mono only where
-   the page shows its own machinery: an element's tag and size.
+   width. Instrument Sans for reading. JetBrains Mono only for an
+   address in a frame and the reel's timecode.
    ============================================================ */
+
+.ch {
+  font-variation-settings:
+    'wght' 800,
+    'wdth' var(--wd);
+}
 
 /* A word solved to fill its container: `--ems` sets the size (box width in
    multiples of the font-size), `--wd` the width that makes it fit. */
@@ -214,12 +206,6 @@
   --wd: var(--wd-w);
 }
 
-.ch {
-  font-variation-settings:
-    'wght' 800,
-    'wdth' var(--wd);
-}
-
 @media (max-aspect-ratio: 5/4) {
   .fit-word {
     --ems: var(--ems-t);
@@ -236,9 +222,9 @@
 }
 
 .t-lead {
-  font-size: clamp(1.375rem, 1rem + 1.3vw, 2.125rem);
-  line-height: 1.14;
-  letter-spacing: -0.028em;
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   font-weight: 500;
   text-wrap: balance;
 }
@@ -247,7 +233,7 @@
   font-size: 1.0625rem;
   line-height: 1.55;
   letter-spacing: -0.012em;
-  color: var(--haze);
+  color: var(--grey);
   text-wrap: pretty;
 }
 
@@ -256,7 +242,7 @@
   line-height: 1.3;
   letter-spacing: 0;
   font-weight: 500;
-  color: var(--haze);
+  color: var(--grey);
 }
 
 .t-tag {
@@ -270,25 +256,33 @@
 /* ============================================================
    NAV
 
-   Fixed on every width. The orange pixel is the active-section
-   marker: it sits before whichever link owns the middle of the
-   screen, and before the name at the top of the page.
+   Fixed on every width. The orange pixel marks the scene on
+   screen: before the name at the top, before a link after that.
+   Over the dark contact sheet it turns to paper.
    ============================================================ */
 
 .nav-shell {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
+  color: var(--ink);
   transition:
     background-color 0.3s linear,
-    box-shadow 0.3s linear;
+    box-shadow 0.3s linear,
+    color 0.3s linear;
 }
 
 .nav-shell[data-scrolled] {
-  background: rgb(58 45 255 / 0.86);
+  background: rgb(244 244 244 / 0.86);
   box-shadow: 0 1px 0 var(--line);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.nav-shell[data-tone='dark'] {
+  color: var(--paper);
+  background: rgb(17 17 17 / 0.86);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.1);
 }
 
 .nav {
@@ -314,26 +308,23 @@
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1;
-  color: var(--haze);
+  color: inherit;
+  opacity: 0.62;
   text-decoration: none;
   border-radius: 2px;
-  transition: color 0.15s linear;
+  transition: opacity 0.15s linear;
 }
 
 /* The name's own padding hangs in the margin so its first letter sits on the
    grid's first line, with the pixel parked just outside it. */
 .nav-name {
   margin-left: -1.25rem;
-  color: var(--white);
+  opacity: 1;
 }
 
 .nav-link:hover,
 .nav-link[aria-current] {
-  color: var(--white);
-}
-
-.nav-link:hover {
-  background: var(--hl);
+  opacity: 1;
 }
 
 .nav-pixel {
@@ -348,10 +339,54 @@
 }
 
 /* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.875rem;
+  padding: 0 1.25rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s linear,
+    border-color 0.15s linear,
+    color 0.15s linear;
+}
+
+.btn-solid {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-solid:hover:not(:disabled) {
+  background: #333;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.btn-ghost:hover {
+  border-color: var(--ink);
+}
+
+/* ============================================================
    HERO
    ============================================================ */
 
-.hero {
+.scene-hero {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -422,257 +457,180 @@
 }
 
 /* ============================================================
-   BUTTONS
+   WORK
+
+   Seven projects, each its own text and framed screenshot. On the
+   calm page they stack, with generous room between them; in the
+   story they share one frame and one text column, and the scroll
+   swaps them in place.
    ============================================================ */
 
-.btn {
-  display: inline-flex;
-  align-items: center;
+.scene-work {
+  padding-block: clamp(5rem, 12vw, 10rem);
+}
+
+.work-head {
+  display: grid;
   gap: 0.5rem;
-  min-height: 2.875rem;
-  padding: 0 1.25rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-family: inherit;
-  font-size: 0.9375rem;
+}
+
+.work-head h2 {
+  margin: 0;
+}
+
+.work-lead {
+  margin: 0;
+  max-width: 40ch;
+}
+
+.work-lead-main {
+  display: block;
+  font-size: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   font-weight: 500;
-  letter-spacing: -0.012em;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color 0.15s linear,
-    border-color 0.15s linear,
-    color 0.15s linear;
 }
 
-.btn-solid {
-  background: var(--white);
-  color: var(--blue);
+.work-lead-rest {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--grey);
 }
 
-.btn-solid:hover:not(:disabled) {
-  background: var(--haze);
+.work-ticks {
+  display: none;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--white);
-  border-color: var(--line-strong);
+.projects {
+  display: grid;
+  gap: clamp(4rem, 10vw, 8rem);
+  list-style: none;
+  margin: clamp(3rem, 6vw, 5rem) 0 0;
+  padding: 0;
 }
 
-.btn-ghost:hover {
-  background: var(--hl);
-  border-color: var(--white);
+.project {
+  display: grid;
+  gap: 1.75rem;
 }
 
-/* ============================================================
-   SECTIONS
-
-   Every section opens on its name set as a fitted word. On the
-   way into view the word grows from its narrowest into its box —
-   the same move the reel makes with "Systems".
-   ============================================================ */
-
-.section {
+.project-shot {
   position: relative;
-  padding-top: clamp(4rem, 10vw, 9rem);
+  order: -1;
 }
 
-.chapter {
+@media (min-width: 900px) {
+  .project {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: center;
+    gap: 0;
+  }
+
+  .project-text {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
+
+  .project-shot {
+    grid-column: 7 / span 6;
+    grid-row: 1;
+  }
+}
+
+.project-text {
+  container-type: inline-size;
+}
+
+.project-title {
   margin: 0;
   font-weight: inherit;
 }
 
-.chapter .ch {
-  transition: font-variation-settings 1.1s var(--ease-snap);
-  transition-delay: calc(var(--i) * 45ms);
-}
-
-.chapter[data-armed]:not([data-in]) .ch {
-  --wd: 50;
-  transition-duration: 0s;
-  transition-delay: 0s;
-}
-
-.section-lead {
-  display: grid;
-  gap: 1rem;
-  margin-top: clamp(1.5rem, 3vw, 2.5rem);
-}
-
-@media (min-width: 900px) {
-  .section-lead {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 0;
-  }
-
-  .section-lead > :first-child {
-    grid-column: 1 / span 6;
-  }
-
-  .section-lead > :last-child {
-    grid-column: 7 / span 5;
-    align-self: end;
-  }
-}
-
-.section-lead p {
-  margin: 0;
-}
-
-/* ============================================================
-   WORK
-
-   An index of the seven projects. Each row is the project's
-   external link. On a wide screen with a fine pointer, the row
-   under the pointer raises its screenshot in the column beside
-   the index; everywhere else the screenshot ships in the row.
-   Screenshots arrive by construction — five columns filling in
-   alternately from top and bottom, the reel's flood in miniature.
-   ============================================================ */
-
-.work-body {
-  margin-top: clamp(2.5rem, 5vw, 4.5rem);
-}
-
-.work-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
-}
-
-.work-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.375rem 1rem;
-  padding: 1.375rem 0 1.5rem;
-  border-bottom: 1px solid var(--line);
-  color: inherit;
-  text-decoration: none;
-}
-
-.work-title {
+.title-lines {
+  display: block;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
-  line-height: 0.95;
-  font-variation-settings:
-    'wght' 760,
-    'wdth' 88;
-  transition: font-variation-settings 0.6s var(--ease-snap);
+  font-size: calc(100cqi / var(--ems));
+  line-height: 0.84;
 }
 
-@media (hover: hover) {
-  .work-row:hover .work-title {
-    font-variation-settings:
-      'wght' 760,
-      'wdth' 112;
-  }
+.fit-mask {
+  display: block;
+  overflow: hidden;
+  /* Room for the descenders the lines are masked over. */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
 }
 
-.work-row:focus-visible .work-title {
-  font-variation-settings:
-    'wght' 760,
-    'wdth' 112;
+.fit-line {
+  display: block;
+  white-space: nowrap;
 }
 
-.work-arrow {
-  align-self: start;
-  margin-top: 0.25rem;
-  color: var(--haze);
-  transition:
-    color 0.15s linear,
-    transform 0.3s var(--ease-snap);
-}
-
-.work-row:hover .work-arrow,
-.work-row:focus-visible .work-arrow {
-  color: var(--white);
-  transform: translate(2px, -2px);
-}
-
-.work-meta {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
+.project-meta {
+  display: grid;
+  gap: 0.125rem;
+  margin: 1.25rem 0 0;
   font-size: 0.9375rem;
-  color: var(--haze);
 }
 
-.work-meta span:first-child {
-  color: var(--white);
+.project-meta span + span {
+  color: var(--grey);
 }
 
-.work-summary {
-  grid-column: 1 / -1;
-  margin: 0.375rem 0 0;
-  max-width: 52ch;
+.project-summary {
+  margin: 0.875rem 0 0;
+  max-width: 44ch;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--haze);
+  color: var(--grey);
+  text-wrap: pretty;
 }
 
-.work-shot {
-  grid-column: 1 / -1;
-  margin-top: 1rem;
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 1.125rem;
+  padding: 0.375rem 0;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--line-strong);
+  transition: text-decoration-color 0.15s linear;
 }
 
-.preview-col {
-  display: none;
+.project-link:hover {
+  text-decoration-color: var(--ink);
 }
 
-@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
-  .work-body {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-
-  .work-list {
-    grid-column: 1 / span 7;
-  }
-
-  .work-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding: 1.5rem 0.25rem 1.5rem 0;
-  }
-
-  /* Tied to the column, so the longest title still fits it fully stretched. */
-  .work-title {
-    font-size: min(3.25rem, 3.4vw);
-  }
-
-  .work-summary,
-  .work-shot {
-    display: none;
-  }
-
-  .preview-col {
-    display: block;
-    grid-column: 9 / span 4;
-  }
-
-  /* The raised project keeps its stretch after the pointer moves on, so the
-     index always shows which row the preview belongs to. */
-  .work-row[data-active] .work-title {
-    font-variation-settings:
-      'wght' 760,
-      'wdth' 112;
-  }
-
-  /* The grid item stretches to the height of the index; the sticky box has
-     to be a shorter child inside it, or it has no room to travel. */
-  .preview {
-    position: sticky;
-    top: calc(var(--nav-h) + 2.5rem);
-  }
+/* A browser frame: an address bar over the screenshot. The story tilts it
+   toward the pointer, so it carries its own perspective. */
+.frame {
+  display: block;
+  transform: perspective(1400px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-origin: 50% 50%;
 }
 
-/* A screenshot frame. Each screenshot is masked by five columns whose
-   heights are registered custom properties, so every column can transition
-   on its own delay: odd columns grow from the top, even ones from the bottom,
-   and the frame fills the way the reel floods the screen. */
+.frame-bar {
+  display: flex;
+  align-items: center;
+  height: 1.875rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: #fbfbfb;
+  color: var(--grey);
+}
+
+/* Each screenshot is masked by five columns whose heights are registered
+   custom properties, so every column can grow on its own: odd columns from
+   the top, even ones from the bottom — the reel's flood, in miniature. The
+   story scrubs them; everywhere else they rest at full. */
 @property --c0 {
   syntax: '<percentage>';
   inherits: false;
@@ -708,8 +666,9 @@
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: var(--blue-deep);
-  outline: 1px solid var(--line);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 0 0 6px 6px;
 }
 
 .shot-layer {
@@ -732,38 +691,10 @@
     75% 100%,
     100% 0%;
   mask-repeat: no-repeat;
-  transition:
-    --c0 0.75s var(--ease-snap),
-    --c1 0.75s var(--ease-snap) 55ms,
-    --c2 0.75s var(--ease-snap) 110ms,
-    --c3 0.75s var(--ease-snap) 165ms,
-    --c4 0.75s var(--ease-snap) 220ms;
 }
 
-.shot[data-armed]:not([data-in]) .shot-layer,
-.shot-layer:not([data-active]) {
-  --c0: 0%;
-  --c1: 0%;
-  --c2: 0%;
-  --c3: 0%;
-  --c4: 0%;
-  transition: none;
-}
-
-.shot-layer[data-active] {
-  z-index: 1;
-}
-
-/* The outgoing screenshot stays put underneath until the incoming one has
-   covered it; only the layer that just lost the stage holds at full. */
-.shot-layer[data-prev] {
-  --c0: 100%;
-  --c1: 100%;
-  --c2: 100%;
-  --c3: 100%;
-  --c4: 100%;
-}
-
+/* Drive Stories ships in the App Store and has no site to screenshot, so its
+   frame says so in type rather than leaving an empty well. */
 .shot-plate {
   position: absolute;
   inset: 0;
@@ -772,9 +703,14 @@
   justify-content: space-between;
   padding: 1.25rem;
   background: var(--night);
+  color: var(--paper);
 }
 
-.shot-plate .plate-title {
+.shot-plate .t-label {
+  color: var(--grey-on-ink);
+}
+
+.plate-title {
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 1rem + 2vw, 2.75rem);
   line-height: 0.9;
@@ -793,36 +729,33 @@
   background: var(--signal);
 }
 
-/* The inspector's tag over the frame: the element and its real size. */
-.inspect {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 0.75rem;
-  color: var(--haze);
-}
-
-.preview-summary {
-  margin: 0.875rem 0 0;
-  min-height: 4.5em;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--haze);
-}
-
 /* ============================================================
    ABOUT — STACK MORPH
 
    The technology list is the content; the stage beside it is the
-   reel's particle field, held still until someone points at a
-   name. The canvas is decoration — every name is a real button,
-   and hover, focus and tap all drive the stage the same way.
+   reel's particle field, held still until something points at a
+   name — a pointer, a finger, or the scroll. The canvas is
+   decoration; every name is a real button.
    ============================================================ */
+
+.scene-about {
+  padding-block: clamp(5rem, 12vw, 10rem);
+}
+
+.about-lead-block {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 2.25rem;
+}
+
+.about-lead-block h2,
+.about-lead-block p {
+  margin: 0;
+}
 
 .stack-grid {
   display: grid;
   gap: 2.5rem;
-  margin-top: clamp(2.5rem, 5vw, 4.5rem);
 }
 
 @media (min-width: 768px) {
@@ -849,8 +782,9 @@
 .stack-stage {
   position: relative;
   aspect-ratio: 4 / 3;
-  outline: 1px solid var(--line);
-  background: rgb(8 6 31 / 0.16);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fbfbfb;
 }
 
 .stack-stage canvas {
@@ -864,11 +798,11 @@
 .stack-caption {
   margin: 0.75rem 0 0;
   min-height: 1.25rem;
-  color: var(--white);
+  color: var(--ink);
 }
 
 .stack-group + .stack-group {
-  margin-top: 1.5rem;
+  margin-top: 1.375rem;
 }
 
 .stack-names {
@@ -889,7 +823,7 @@
   font-size: 1.0625rem;
   font-weight: 500;
   letter-spacing: -0.015em;
-  color: var(--haze);
+  color: var(--grey);
   background: transparent;
   border: 0;
   border-radius: 2px;
@@ -901,7 +835,7 @@
 }
 
 .stack-name[aria-pressed='true'] {
-  color: var(--white);
+  color: var(--ink);
 }
 
 /* The pressed name carries the pixel, like the nav's active link. */
@@ -918,18 +852,84 @@
 
 .stack-name:hover,
 .stack-name:focus-visible {
-  color: var(--white);
+  color: var(--ink);
   background: var(--hl);
 }
 
 /* ============================================================
-   CONTACT
+   CONTACT + FOOTER — THE SHEET
+
+   The page ends on a dark sheet. In the story it slides up over
+   the pinned stage like a curtain; on the calm page it is simply
+   the last thing on it.
    ============================================================ */
+
+.sheet {
+  position: relative;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sheet :focus-visible {
+  outline-color: var(--paper);
+}
+
+.sheet ::selection {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sheet .t-label,
+.sheet .t-body {
+  color: var(--grey-on-ink);
+}
+
+.sheet .btn-solid {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.sheet .btn-solid:hover:not(:disabled) {
+  background: #d9d9d9;
+}
+
+.sheet .btn-ghost {
+  color: var(--paper);
+  border-color: rgb(255 255 255 / 0.3);
+}
+
+.sheet .btn-ghost:hover {
+  border-color: var(--paper);
+}
+
+/* The sheet's own top padding clears the nav, so a jump to contact lands
+   with the sheet flush to the top rather than a strip of stage above it. */
+#contact {
+  scroll-margin-top: 0;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  padding-block: calc(var(--nav-h) + 3rem) 4rem;
+}
+
+.contact-head {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contact-head h2,
+.contact-head p {
+  margin: 0;
+}
 
 .contact-grid {
   display: grid;
   gap: 3rem;
-  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
 }
 
 @media (min-width: 900px) {
@@ -955,11 +955,11 @@
   font-variation-settings:
     'wght' 700,
     'wdth' 92;
-  color: var(--white);
+  color: var(--paper);
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 0.2em;
-  text-decoration-color: var(--line-strong);
+  text-decoration-color: rgb(255 255 255 / 0.3);
   overflow-wrap: anywhere;
   transition:
     font-variation-settings 0.6s var(--ease-snap),
@@ -971,32 +971,28 @@
   font-variation-settings:
     'wght' 700,
     'wdth' 104;
-  text-decoration-color: var(--white);
+  text-decoration-color: var(--paper);
 }
 
 .field {
   width: 100%;
-  background: rgb(8 6 31 / 0.18);
-  border: 1px solid var(--line-strong);
-  border-radius: 2px;
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 6px;
   padding: 0.75rem 0.875rem;
   font-family: inherit;
   font-size: 1rem;
   letter-spacing: -0.01em;
-  color: var(--white);
+  color: var(--paper);
   transition:
     border-color 0.15s linear,
     background-color 0.15s linear;
 }
 
-.field::placeholder {
-  color: var(--haze);
-}
-
 .field:focus {
   outline: none;
-  border-color: var(--white);
-  background: rgb(8 6 31 / 0.3);
+  border-color: var(--paper);
+  background: rgb(255 255 255 / 0.07);
 }
 
 .field-label {
@@ -1020,7 +1016,7 @@
 }
 
 .form-row:focus-within .field-label {
-  color: var(--white);
+  color: var(--paper);
 }
 
 .form-row:focus-within .field-label::before {
@@ -1028,20 +1024,14 @@
 }
 
 .card {
-  border: 1px solid var(--line-strong);
-  background: rgb(8 6 31 / 0.18);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 6px;
   padding: 1.5rem;
 }
 
-/* ============================================================
-   FOOTER — CREDITS
-   ============================================================ */
-
 .footer {
-  position: relative;
-  margin-top: clamp(5rem, 12vw, 10rem);
   padding-top: 1.75rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
 }
 
 .footer-row {
@@ -1063,19 +1053,19 @@
   align-items: baseline;
   gap: 0.5rem;
   padding-block: 0.375rem;
-  color: var(--white);
+  color: var(--paper);
   text-decoration: none;
   font-weight: 500;
 }
 
 .footer-link .t-tag {
-  color: var(--haze);
+  color: var(--grey-on-ink);
   transition: color 0.15s linear;
 }
 
 .footer-link:hover .t-tag,
 .footer-link:focus-visible .t-tag {
-  color: var(--white);
+  color: var(--paper);
 }
 
 .footer-link:hover {
@@ -1090,7 +1080,7 @@
   padding: 0.375rem 0;
   border: 0;
   background: none;
-  color: var(--haze);
+  color: var(--grey-on-ink);
   font: inherit;
   font-weight: 500;
   cursor: pointer;
@@ -1106,7 +1096,7 @@
 }
 
 .replay:hover {
-  color: var(--white);
+  color: var(--paper);
 }
 
 .replay:hover::before {
@@ -1114,29 +1104,350 @@
 }
 
 /* A wordmark set to fill the page's last line: texture, not a second
-   reading of the name, so it is hidden from the a11y tree. */
+   reading of the name, so it is hidden from the a11y tree. A ghost fill
+   rather than an outline: the variable font's glyphs are built from
+   overlapping contours, and a stroke draws every seam between them. */
 .footer-mark {
   margin-top: clamp(3rem, 8vw, 6rem);
   overflow: hidden;
   padding-top: 0.12em;
 }
 
-/* A ghost fill rather than an outline: the variable font's glyphs are built
-   from overlapping contours, and a stroke draws every seam between them. */
 .footer-mark .fit-word {
   line-height: 0.74;
-  color: rgb(255 255 255 / 0.1);
+  color: rgb(255 255 255 / 0.08);
   user-select: none;
   touch-action: pan-y;
+}
+
+/* ============================================================
+   THE STORY
+
+   With JavaScript and motion allowed, the head script sets
+   `data-scenes` and the page becomes one pinned stage: the hero,
+   the work and the stack are layers on it, and the scroll track
+   behind it drives a single scrubbed timeline. The stage is
+   sticky rather than pinned by script, so the browser holds it
+   still — a phone's address bar coming and going moves nothing.
+   It is `lvh` tall so it always covers the screen, and every
+   scene inside it is laid out in `svh`, so nothing sits under
+   the bar when it is showing.
+   ============================================================ */
+
+.story {
+  /* The timeline's length in screens; story/engine.ts reads it back. */
+  --story-len: 13;
+  position: relative;
+}
+
+.story-pixel,
+.story-box {
+  display: none;
+}
+
+html[data-scenes] .story {
+  height: calc(var(--story-len) * 100svh + 100lvh);
+}
+
+.story-anchor {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  scroll-margin-top: 0;
+  pointer-events: none;
+}
+
+html[data-scenes] .stage {
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  overflow: hidden;
+}
+
+html[data-scenes] .scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100svh;
+  min-height: 0;
+  padding: 0;
+}
+
+html[data-scenes] .scene-hero {
+  padding-block: calc(var(--nav-h) + 3rem) 4rem;
+}
+
+/* Stacking on the stage: the hero, then the pixel flying over it, then the
+   work and the stack — so a project's first screenshot builds over the
+   pixel that became its frame — and the travelling outline above all. */
+html[data-scenes] .story-pixel {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  background: var(--signal);
+  pointer-events: none;
+}
+
+html[data-scenes] .scene-work,
+html[data-scenes] .scene-about {
+  z-index: 2;
+}
+
+html[data-scenes] .story-box {
+  display: block;
+  position: absolute;
+  z-index: 3;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* ----- work, on the stage ----- */
+
+html[data-scenes] .work-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  padding-top: calc(var(--nav-h) + clamp(0.5rem, 2.5svh, 2rem));
+  padding-bottom: clamp(1rem, 4svh, 2.5rem);
+}
+
+html[data-scenes] .work-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 1.5rem;
+  row-gap: 0.375rem;
+}
+
+html[data-scenes] .work-head h2 {
+  grid-area: 1 / 1;
+}
+
+html[data-scenes] .work-ticks {
+  display: flex;
+  position: relative;
+  grid-area: 1 / 2;
+  gap: 0.25rem;
+  margin-right: -0.375rem;
+}
+
+html[data-scenes] .work-lead {
+  grid-area: 2 / 1 / 3 / -1;
+}
+
+.work-tick {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.work-tick::before {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: auto;
+  border: 1px solid var(--line-strong);
+}
+
+.work-tick:hover::before {
+  border-color: var(--ink);
+}
+
+.work-marker {
+  position: absolute;
+  left: calc(0.75rem - 3.5px);
+  top: calc(50% - 3.5px);
+  width: 7px;
+  height: 7px;
+  background: var(--signal);
+  pointer-events: none;
+}
+
+html[data-scenes] .work-body {
+  position: relative;
+}
+
+html[data-scenes] .projects {
+  position: absolute;
+  inset: 0;
+  display: block;
+  margin: 0;
+}
+
+html[data-scenes] .work-lead {
+  max-width: 52ch;
+}
+
+html[data-scenes] .work-lead-main {
+  display: inline;
+  font-size: clamp(1.0625rem, 0.85rem + 0.7vw, 1.375rem);
+  letter-spacing: -0.02em;
+}
+
+html[data-scenes] .work-lead-rest {
+  display: inline;
+  margin: 0;
+  font-size: clamp(0.875rem, 0.8rem + 0.4vw, 1.0625rem);
+}
+
+/* Every project is a full-size layer on the same grid, so their frames land
+   exactly on top of one another and each new screenshot builds over the
+   last. */
+html[data-scenes] .project {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+  gap: 0;
+}
+
+html[data-scenes] .project-text {
+  grid-column: 1 / span 5;
+  grid-row: 1;
+}
+
+/* On the stage a frame's well is see-through: the first screenshot builds
+   over the pixel that flew in to become its frame, and each one after over
+   the screenshot it replaces. */
+html[data-scenes] .shot {
+  background: transparent;
+}
+
+html[data-scenes] .project-shot {
+  grid-column: 7 / span 6;
+  grid-row: 1;
+  /* Never taller than the room left on a short screen. */
+  width: min(100%, (100svh - var(--nav-h) - 11rem) * 1.6);
+  justify-self: end;
+  /* A sideways drag tilts the frame; an upward one still scrolls. */
+  touch-action: pan-y;
+}
+
+@media (max-aspect-ratio: 5/4) {
+  html[data-scenes] .project {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    align-content: start;
+    row-gap: clamp(1rem, 3svh, 1.75rem);
+    padding-top: clamp(0.75rem, 2.5svh, 1.5rem);
+  }
+
+  html[data-scenes] .project-text,
+  html[data-scenes] .project-shot {
+    grid-column: 1;
+  }
+
+  html[data-scenes] .project-shot {
+    grid-row: 1;
+    width: min(100%, 26svh * 1.6);
+    justify-self: center;
+  }
+
+  html[data-scenes] .project-text {
+    grid-row: 2;
+  }
+
+  /* A short phone caps the title by height; it then sits short of the
+     column rather than pushing the link off the screen. */
+  html[data-scenes] .title-lines {
+    font-size: min(100cqi / var(--ems), 8.5svh);
+  }
+
+  html[data-scenes] .project-meta {
+    margin-top: 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  html[data-scenes] .project-summary {
+    margin-top: 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  html[data-scenes] .project-link {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ----- about, on the stage ----- */
+
+html[data-scenes] .about-shell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding-top: calc(var(--nav-h) + clamp(0.5rem, 2.5svh, 2rem));
+  padding-bottom: clamp(1rem, 4svh, 2.5rem);
+}
+
+html[data-scenes] .stack-grid {
+  align-items: center;
+}
+
+@media (max-aspect-ratio: 5/4) {
+  html[data-scenes] .about-shell {
+    justify-content: flex-start;
+  }
+
+  /* The lead lives at the head of the list column; on a tall screen the
+     column dissolves so the lead can go above the stage and the list below. */
+  html[data-scenes] .stack-grid {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3svh, 1.75rem);
+  }
+
+  html[data-scenes] .stack-list-col {
+    display: contents;
+  }
+
+  html[data-scenes] .about-lead-block {
+    order: -1;
+    margin-bottom: 0;
+  }
+
+  html[data-scenes] .stack-stage {
+    width: min(100%, 34svh * 4 / 3);
+    margin-inline: auto;
+  }
+
+  /* On a tall screen only the group the scroll is in is shown; the scroll
+     brings each one up in turn. The rest are hidden from sight only, not
+     from a screen reader — and a name that takes focus makes its own group
+     the shown one. */
+  html[data-scenes] .stack-group:not([data-current]) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ----- the contact sheet, over the stage ----- */
+
+/* Pulled up over the stage's last screen, so it covers the stage from the
+   moment the stage lets go: the story never visibly scrolls away. */
+html[data-scenes] .sheet {
+  z-index: 20;
+  margin-top: -100lvh;
 }
 
 /* ============================================================
    THE REEL
 
    Painted from the first frame when the head script opts in, and
-   gone the moment the reel lets go. Its ground is night until the
-   flood; after the flood it is the page's own blue, which is why
-   the handoff is invisible.
+   gone the moment the reel lets go. It opens on night and floods
+   to paper; after the flood its ground is the page's, which is
+   why the handoff is invisible.
    ============================================================ */
 
 .reel,
@@ -1213,7 +1524,7 @@ html[data-intro='play'] [data-reel-name] {
 
 .reel-flood {
   position: absolute;
-  background: var(--blue);
+  background: var(--paper);
 }
 
 .reel-vline {
@@ -1235,14 +1546,14 @@ html[data-intro='play'] [data-reel-name] {
   position: absolute;
   z-index: 1;
   visibility: hidden;
-  outline: 1px solid rgb(255 255 255 / 0.75);
+  outline: 1px solid rgb(17 17 17 / 0.55);
 }
 
 .reel-box-fill {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: var(--blue-deep);
+  background: var(--paper-2);
 }
 
 .reel-box-img {
@@ -1254,6 +1565,7 @@ html[data-intro='play'] [data-reel-name] {
 
 .reel-box-fill.is-plate {
   background: var(--night);
+  color: var(--paper);
 }
 
 .reel-box-plate {
@@ -1273,8 +1585,8 @@ html[data-intro='play'] [data-reel-name] {
   left: -1px;
   top: -1px;
   padding: 0.25rem 0.375rem;
-  background: var(--white);
-  color: var(--blue);
+  background: var(--ink);
+  color: var(--paper);
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1;
@@ -1287,7 +1599,7 @@ html[data-intro='play'] [data-reel-name] {
   z-index: 3;
   transform: translateY(-50%);
   white-space: nowrap;
-  color: var(--white);
+  color: var(--ink);
 }
 
 .reel-card.is-turned {
@@ -1326,9 +1638,12 @@ html[data-intro='play'] [data-reel-name] {
   text-align: center;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--ink);
 }
 
+/* The timecode and the skip control sit over night first and paper after,
+   so they are drawn in white and blended by difference: white on night,
+   ink on paper, with no handover between the two. */
 .reel-hud {
   position: absolute;
   left: var(--pad);
@@ -1337,7 +1652,8 @@ html[data-intro='play'] [data-reel-name] {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-feature-settings: 'tnum';
-  color: rgb(255 255 255 / 0.72);
+  color: #fff;
+  mix-blend-mode: difference;
 }
 
 html[data-intro] .reel-skip {
@@ -1354,7 +1670,8 @@ html[data-intro] .reel-skip {
   padding: 0 0.25rem;
   border: 0;
   background: none;
-  color: var(--white);
+  color: #fff;
+  mix-blend-mode: difference;
   font: inherit;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -1364,8 +1681,8 @@ html[data-intro] .reel-skip {
 .reel-skip-bar {
   display: block;
   height: 2px;
-  background: rgb(255 255 255 / 0.25);
-  background-image: linear-gradient(var(--white), var(--white));
+  background: rgb(255 255 255 / 0.3);
+  background-image: linear-gradient(#fff, #fff);
   background-repeat: no-repeat;
   background-size: calc(var(--reel-progress, 0) * 100%) 100%;
 }
@@ -1373,8 +1690,9 @@ html[data-intro] .reel-skip {
 /* ============================================================
    REDUCED MOTION
 
-   No reel (the head script never opts in), no swell, no
-   construction: everything is simply in its final place.
+   No reel and no story — the head script opts into neither — so
+   the page is the calm, stacked version, with everything simply
+   in its final place.
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {

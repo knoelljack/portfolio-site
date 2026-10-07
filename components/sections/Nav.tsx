@@ -8,19 +8,29 @@ const LINKS = [
   ['Contact', 'contact'],
 ] as const;
 
+/**
+ * On the calm page the active link comes from which section owns the middle
+ * of the screen. In the story the work and the stack share one stage, which
+ * is always on screen, so the story says which scene is up instead; the
+ * contact sheet is ordinary page in both, and over it the nav turns to paper.
+ */
 export function Nav() {
-  const [active, setActive] = useState<string | null>(null);
+  const [spied, setSpied] = useState<string | null>(null);
+  const [told, setTold] = useState<string | null>(null);
+  const [onSheet, setOnSheet] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [travel, setTravel] = useState(0);
   const barRef = useRef<HTMLElement>(null);
   const nameRef = useRef<HTMLAnchorElement>(null);
   const linkRefs = useRef(new Map<string, HTMLAnchorElement>());
 
+  const active = onSheet ? 'contact' : (told ?? spied);
+
   useEffect(() => {
-    const sections = LINKS.map(([, id]) => document.getElementById(id)).filter(
-      (el): el is HTMLElement => el !== null
-    );
-    if (!sections.length) return;
+    const story = document.documentElement.hasAttribute('data-scenes');
+    const watched = (story ? ['contact'] : LINKS.map(([, id]) => id))
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
 
     const visible = new Set<string>();
     const io = new IntersectionObserver(
@@ -31,21 +41,29 @@ export function Nav() {
         }
         // Sections are observed in document order, so the last visible one is
         // the one the reader has scrolled furthest into.
-        const ids = sections.map((s) => s.id).filter((id) => visible.has(id));
-        setActive(ids.at(-1) ?? null);
+        const ids = watched.map((s) => s.id).filter((id) => visible.has(id));
+        setSpied(ids.at(-1) ?? null);
       },
       // A band across the middle of the viewport: a section counts as read
       // only once it owns the centre of the screen, not the moment its first
       // pixel appears.
       { rootMargin: '-45% 0px -50% 0px' }
     );
-    sections.forEach((s) => io.observe(s));
+    watched.forEach((s) => io.observe(s));
 
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScene = (e: Event) => setTold((e as CustomEvent<string | null>).detail);
+    window.addEventListener('story:scene', onScene);
+
+    const sheet = document.querySelector<HTMLElement>('.sheet');
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      setOnSheet(!!sheet && sheet.getBoundingClientRect().top <= 28);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       io.disconnect();
+      window.removeEventListener('story:scene', onScene);
       window.removeEventListener('scroll', onScroll);
     };
   }, []);
@@ -70,7 +88,12 @@ export function Nav() {
   }, [place]);
 
   return (
-    <div className="nav-shell" data-scrolled={scrolled || undefined} data-reel-in>
+    <div
+      className="nav-shell"
+      data-scrolled={scrolled || undefined}
+      data-tone={onSheet ? 'dark' : undefined}
+      data-reel-in
+    >
       <nav className="nav shell" aria-label="Primary" ref={barRef}>
         <span
           aria-hidden="true"

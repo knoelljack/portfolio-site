@@ -22,7 +22,7 @@ const WORDS = ['Jack', 'Knoell'] as const;
 
 export function HeroName() {
   const ref = useRef<HTMLSpanElement>(null);
-  useSwell(ref, '.hero', 64);
+  useSwell(ref, '.scene-hero', 64);
 
   return (
     <span className="hero-name" style={VARS} ref={ref} data-reel-name aria-hidden="true">

@@ -89,18 +89,18 @@ const IDLE_MS = 3400;
    the stage for the rest of the session. */
 const PIN_RELEASE_MS = 9000;
 
-/* Predominantly white with a thinning tail of haze: the mark has to read as
-   one shape first and as texture second. Travellers flash the page's orange,
-   as they do when the reel's field lands the name. */
+/* Predominantly ink with a thinning tail of grey: the mark has to read as one
+   shape first and as texture second. Travellers flash the page's orange, as
+   they do when the reel's field lands the name. */
 const TONES = [
-  [255, 255, 255],
-  [244, 243, 255],
-  [226, 224, 255],
-  [200, 196, 255],
-  [168, 162, 255],
+  [17, 17, 17],
+  [32, 32, 32],
+  [52, 52, 52],
+  [88, 88, 88],
+  [132, 132, 132],
 ] as const;
 const TONE_WEIGHTS = [0.44, 0.24, 0.16, 0.1, 0.06];
-const ACCENT = [255, 138, 61] as const;
+const ACCENT = [255, 90, 31] as const;
 const BLENDS = 8;
 
 /** One string per (tone, accent blend), built once so the draw loop never has
@@ -247,7 +247,15 @@ function sampleMark(tech: Tech): Int16Array {
   return capped;
 }
 
-export function StackMorph() {
+/**
+ * `lead` is set at the head of the list column, so a layout can put it above
+ * the list and beside the stage, or above the stage, without a second copy.
+ *
+ * The scroll story drives the stage with `stack:scrub` events (the index to
+ * draw); once it has, the idle cycle stops for good and the scroll is in
+ * charge — a pointer, focus or tap still takes over while it is on a name.
+ */
+export function StackMorph({ lead }: { lead?: React.ReactNode }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | null>(null);
@@ -258,6 +266,7 @@ export function StackMorph() {
   const [idle, setIdle] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   const [pinned, setPinned] = useState<number | null>(null);
+  const [driven, setDriven] = useState(false);
 
   const active = hovered ?? pinned ?? idle;
   const tech = TECHS[active];
@@ -293,13 +302,26 @@ export function StackMorph() {
     };
   }, []);
 
+  useEffect(() => {
+    // Scrolling is the reader's most recent ask, so it wins over a name that
+    // was hovered or tapped before the scroll began.
+    const onScrub = (e: Event) => {
+      setDriven(true);
+      setHovered(null);
+      setPinned(null);
+      setIdle((e as CustomEvent<number>).detail);
+    };
+    window.addEventListener('stack:scrub', onScrub);
+    return () => window.removeEventListener('stack:scrub', onScrub);
+  }, []);
+
   /* No idle cycle under reduced motion: the stage holds whatever the reader
      last asked for, and changes only when they ask again. */
   useEffect(() => {
-    if (!awake || engaged || reduced) return;
+    if (!awake || engaged || reduced || driven) return;
     const id = setInterval(() => setIdle((i) => (i + 1) % TECHS.length), IDLE_MS);
     return () => clearInterval(id);
-  }, [awake, engaged, reduced]);
+  }, [awake, engaged, reduced, driven]);
 
   /* Handing the index back to the idle cursor on the way out is what stops the
      cycle from snapping to the top of the list the moment a reader looks away. */
@@ -542,13 +564,18 @@ export function StackMorph() {
       </div>
 
       <div className="stack-list-col">
+        {lead}
         {/* Read once in reading order rather than hung off all 23 buttons as a
             description a screen reader would then repeat on every one. */}
         <p className="sr-only">
           Selecting a technology draws its mark on the panel beside this list.
         </p>
         {GROUPS.map(({ group, items }) => (
-          <div key={group} className="stack-group">
+          <div
+            key={group}
+            className="stack-group"
+            data-current={items.some((item) => item.index === active) || undefined}
+          >
             <p className="t-label">{group}</p>
             <ul className="stack-names">
               {items.map(({ label, index }) => (
@@ -557,7 +584,10 @@ export function StackMorph() {
                     type="button"
                     className="stack-name"
                     aria-pressed={active === index}
-                    onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(index)}
+                    // Move, not enter: on a pinned stage the names never move
+                    // under a resting cursor, but a scene appearing beneath
+                    // one would otherwise count as a hover.
+                    onPointerMove={(e) => e.pointerType === 'mouse' && setHovered(index)}
                     onPointerLeave={(e) => e.pointerType === 'mouse' && release(index)}
                     onFocus={(e) => e.currentTarget.matches(':focus-visible') && setHovered(index)}
                     onBlur={() => release(index)}

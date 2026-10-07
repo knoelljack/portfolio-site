@@ -30,18 +30,23 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
     let pointer: { x: number; y: number } | null = null;
     let raf = 0;
 
+    // Measured in viewport terms each time a pointer arrives, at rest: the
+    // hero sits on a sticky stage, where a letter's place on screen and its
+    // place in the document part ways as soon as the page scrolls.
+    let measured = false;
     const measure = () => {
       for (const l of letters) l.style.removeProperty('--wd');
       base = letters.map((l) => parseFloat(getComputedStyle(l).getPropertyValue('--wd')) || 100);
       now = base.slice();
       const rects = letters.map((l) => l.getBoundingClientRect());
-      cx = rects.map((r) => r.left + r.width / 2 + window.scrollX);
-      cy = rects.map((r) => r.top + r.height / 2 + window.scrollY);
+      cx = rects.map((r) => r.left + r.width / 2);
+      cy = rects.map((r) => r.top + r.height / 2);
       weight = rects.map((r) => r.width);
       height = rects[0]?.height || 1;
       const tops = Array.from(new Set(rects.map((r) => Math.round(r.top))));
       line = rects.map((r) => tops.indexOf(Math.round(r.top)));
       lines = tops.length;
+      measured = true;
     };
 
     const frame = () => {
@@ -49,8 +54,8 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
       const goal = base.slice();
       if (pointer) {
         const pull = letters.map((_, i) => {
-          const dx = (cx[i] - window.scrollX - pointer!.x) / (height * 0.9);
-          const dy = (cy[i] - window.scrollY - pointer!.y) / (height * 1.4);
+          const dx = (cx[i] - pointer!.x) / (height * 0.9);
+          const dy = (cy[i] - pointer!.y) / (height * 1.4);
           return Math.exp(-dx * dx - dy * dy);
         });
         for (let k = 0; k < lines; k++) {
@@ -76,7 +81,10 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
         l.style.setProperty('--wd', Math.min(200, Math.max(50, now[i])).toFixed(2));
       });
       if (moving || pointer) raf = requestAnimationFrame(frame);
-      else for (const l of letters) l.style.removeProperty('--wd');
+      else {
+        for (const l of letters) l.style.removeProperty('--wd');
+        measured = false;
+      }
     };
 
     const wake = () => {
@@ -85,6 +93,7 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
     const onMove = (e: PointerEvent) => {
       if (document.documentElement.hasAttribute('data-intro')) return;
       if (e.pointerType !== 'mouse' && e.buttons === 0) return;
+      if (!measured && !raf) measure();
       pointer = { x: e.clientX, y: e.clientY };
       wake();
     };
@@ -92,19 +101,23 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
       pointer = null;
       wake();
     };
+    const onScroll = () => {
+      if (!raf) measured = false;
+    };
 
-    measure();
     const ro = new ResizeObserver(() => {
       cancelAnimationFrame(raf);
       raf = 0;
       pointer = null;
-      measure();
+      for (const l of letters) l.style.removeProperty('--wd');
+      measured = false;
     });
     ro.observe(root);
     region.addEventListener('pointermove', onMove);
     region.addEventListener('pointerleave', onLeave);
     region.addEventListener('pointerup', onLeave);
     region.addEventListener('pointercancel', onLeave);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
@@ -113,6 +126,7 @@ export function useSwell(ref: RefObject<HTMLElement | null>, area: string, amoun
       region.removeEventListener('pointerleave', onLeave);
       region.removeEventListener('pointerup', onLeave);
       region.removeEventListener('pointercancel', onLeave);
+      window.removeEventListener('scroll', onScroll);
       for (const l of letters) l.style.removeProperty('--wd');
     };
   }, [ref, area, amount]);

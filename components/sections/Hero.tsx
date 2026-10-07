@@ -3,7 +3,7 @@ import { HeroName } from './HeroName';
 
 export function Hero() {
   return (
-    <header id="top" className="hero shell">
+    <header id="top" className="scene scene-hero shell" data-scene="top">
       <div className="hero-body">
         <p className="hero-role t-label" data-reel-in>
           Front-end engineer

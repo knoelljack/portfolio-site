@@ -71,7 +71,13 @@ export function Reel() {
       }
     };
 
-    if (html.getAttribute('data-intro') === 'play') start();
+    if (html.getAttribute('data-intro') === 'play') {
+      // Past the head script's failsafe the page has already let itself go,
+      // and the reader may be reading: a reel arriving now would only get in
+      // the way. Replay is still there in the footer.
+      if (performance.now() > 5500) html.removeAttribute('data-intro');
+      else start();
+    }
 
     const replay = () => {
       if (html.hasAttribute('data-intro')) return;

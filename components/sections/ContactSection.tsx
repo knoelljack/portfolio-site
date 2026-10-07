@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Chapter } from './Chapter';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
@@ -30,13 +29,14 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="section shell">
-      <Chapter word="Contact" />
-
-      <div className="section-lead">
+    <section id="contact" className="contact shell" aria-labelledby="contact-heading">
+      <header className="contact-head">
+        <h2 id="contact-heading" className="t-label">
+          Contact
+        </h2>
         <p className="t-lead">Open to new projects.</p>
         <p className="t-body">Tell me what you are building.</p>
-      </div>
+      </header>
 
       <div className="contact-grid">
         <dl className="grid content-start gap-8">

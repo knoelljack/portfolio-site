@@ -52,16 +52,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#3a2dff',
+  themeColor: '#f4f4f4',
 };
 
 /**
- * Runs before first paint, so the reel's opening frame is what the page paints
- * first rather than something that covers the page a beat later. It only ever
- * opts in: without JavaScript, under reduced motion, or on a deep link to a
- * section, the attribute is never set and the page renders as a plain page.
+ * Runs before first paint, so the page paints in the layout it will keep and
+ * the reel's opening frame is the first thing on screen. It only ever opts in:
+ * without JavaScript or under reduced motion neither attribute is set, and the
+ * page renders as a plain, stacked page.
+ *
+ * `data-scenes` turns the page into the scroll story. If the story's script
+ * never arrives to claim it, the page drops back to the stacked layout rather
+ * than leaving a stage that nothing drives. `data-intro` plays the reel, except
+ * on a deep link to a section.
  */
-const INTRO_GATE = `(function(){try{var q=location.search;if(/[?&]intro=0\\b/.test(q))return;if(!/[?&]intro=1\\b/.test(q)&&(matchMedia('(prefers-reduced-motion: reduce)').matches||location.hash.length>1))return;document.documentElement.setAttribute('data-intro','play')}catch(e){}})()`;
+const GATE = `(function(){try{var d=document.documentElement,q=location.search;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-scenes','');setTimeout(function(){if(!window.__story)d.removeAttribute('data-scenes')},6000);if(/[?&]intro=0\\b/.test(q))return;if(!/[?&]intro=1\\b/.test(q)&&location.hash.length>1)return;d.setAttribute('data-intro','play')}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -71,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: INTRO_GATE }} />
+        <script dangerouslySetInnerHTML={{ __html: GATE }} />
       </head>
       <body>
         <Reel />
@@ -84,7 +89,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </div>
         <Nav />
         <main className="relative z-10">{children}</main>
-        <div className="grain" aria-hidden="true" />
       </body>
     </html>
   );
