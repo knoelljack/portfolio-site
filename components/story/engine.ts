@@ -481,13 +481,16 @@ export function createStory(track: HTMLElement, pacing = true): StoryControls {
       if (window.innerWidth === width && svh() === small) return;
       width = window.innerWidth;
       small = svh();
+      const y = window.scrollY;
       const at = st?.progress ?? 0;
+      const past = st && y > st.end ? y - st.end : null;
       pacer?.stop();
       teardownTimeline();
       build();
       ScrollTrigger.refresh();
       if (st) {
-        window.scrollTo({ top: st.start + at * (st.end - st.start), behavior: 'instant' });
+        const top = past === null ? st.start + at * (st.end - st.start) : st.end + past;
+        window.scrollTo({ top, behavior: 'instant' });
         settle();
       }
     }, 180);
