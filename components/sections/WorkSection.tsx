@@ -1,35 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useState, useSyncExternalStore } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { projects } from '@/lib/projects';
 import type { Project } from '@/lib/types';
+import { Chapter } from './Chapter';
+import { Shot, ShotLayer } from './Shot';
 
-function Plate({ project }: { project: Project }) {
-  return (
-    <div className="preview-plate">
-      <span className="mono">Ships in the App Store</span>
-      <span className="t-lead">{project.title}</span>
-      <span
-        aria-hidden="true"
-        className="pixel"
-        style={{ bottom: '1.25rem', right: '1.25rem', transform: 'rotate(16deg)' }}
-      />
-    </div>
-  );
-}
+const host = (link: string) => new URL(link).host.replace(/^www\./, '');
+
+/** Must match the media query that shows `.preview-col` in globals.css. */
+const PREVIEW_QUERY = '(min-width: 1100px) and (hover: hover) and (pointer: fine)';
+
+const subscribe = (onChange: () => void) => {
+  const mq = matchMedia(PREVIEW_QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+};
 
 /**
- * Every project is mounted at once and cross-faded by opacity, so the
- * screenshots decode before the first hover and the preview lands
- * immediately instead of flashing an empty frame. It is seeded with the
- * first project and holds whatever was raised last — an empty well beside
- * a full index reads as something failing to load.
+ * Every project is mounted at once, so the screenshots decode before the first
+ * hover. The raised one constructs itself over the one it replaces, which holds
+ * still underneath until it is covered — a swap never flashes the empty frame.
+ *
+ * The screenshots mount only where the preview is shown, and load eagerly
+ * there: seven stacked, mostly-masked frames are exactly what native lazy
+ * loading misjudges, and a touch screen should not pay for them at all.
  */
-function Preview({ activeSlug }: { activeSlug: string }) {
-  const active = projects.find((p) => p.slug === activeSlug);
-  const index = projects.findIndex((p) => p.slug === activeSlug);
+function Preview({ active, previous }: { active: string; previous: string | null }) {
+  const project = projects.find((p) => p.slug === active);
+  const shown = useSyncExternalStore(
+    subscribe,
+    () => matchMedia(PREVIEW_QUERY).matches,
+    () => false
+  );
 
   return (
     // The grid item is the outer column, stretched to the height of the
@@ -37,31 +41,24 @@ function Preview({ activeSlug }: { activeSlug: string }) {
     // no room to travel and never sticks at all.
     <div className="preview-col" aria-hidden="true">
       <div className="preview">
-        <div className="preview-frame">
-          {projects.map((project) => (
-            <div
-              key={project.slug}
-              className="absolute inset-0 transition-opacity duration-150"
-              style={{ opacity: project.slug === activeSlug ? 1 : 0 }}
-            >
-              {project.image ? (
-                <Image
-                  src={project.image}
-                  alt=""
-                  fill
-                  sizes="26rem"
-                  className="object-cover object-top"
-                />
-              ) : (
-                <Plate project={project} />
-              )}
-            </div>
-          ))}
+        <div className="shot">
+          {shown &&
+            projects.map((p) => (
+              <ShotLayer
+                key={p.slug}
+                project={p}
+                sizes="(min-width: 1600px) 520px, 33vw"
+                eager
+                active={p.slug === active}
+                previous={p.slug === previous}
+              />
+            ))}
         </div>
-        <p className="mono mt-3">
-          {String(index + 1).padStart(2, '0')} — {active?.title}
+        <p className="inspect t-tag">
+          <span>{project?.title}</span>
+          <span>{project ? host(project.link) : ''}</span>
         </p>
-        <p className="preview-summary">{active?.summary ?? ''}</p>
+        <p className="preview-summary">{project?.summary}</p>
       </div>
     </div>
   );
@@ -69,87 +66,78 @@ function Preview({ activeSlug }: { activeSlug: string }) {
 
 function Row({
   project,
-  index,
+  active,
   onEnter,
 }: {
   project: Project;
-  index: number;
+  active: boolean;
   onEnter: () => void;
 }) {
   const label = project.linkLabel ?? 'Visit site';
 
   return (
-    <a
-      href={project.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="work-row"
-      onMouseEnter={onEnter}
-      onFocus={onEnter}
-      aria-label={`${project.title} — ${project.discipline}. ${label}, opens in a new tab.`}
-    >
-      <span className="mono work-idx" aria-hidden="true">
-        {String(index + 1).padStart(2, '0')}
-      </span>
-
-      <span className="t-row work-title">{project.title}</span>
-
-      <span className="mono work-meta">
-        {project.discipline}
-        <span className="work-tech">{project.technologies.join(', ')}</span>
-      </span>
-
-      {/* Screenshots have to reach a touch device somehow, and the adjacent
-          preview never fires there — so a thumbnail ships inline instead. */}
-      {project.image ? (
-        <span className="work-thumb">
-          <Image
-            src={project.image}
-            alt=""
-            fill
-            sizes="120px"
-            className="object-cover object-top"
-          />
+    <li>
+      <a
+        href={project.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="work-row"
+        data-active={active || undefined}
+        onMouseEnter={onEnter}
+        onFocus={onEnter}
+        aria-label={`${project.title} — ${project.discipline}. ${label}, opens in a new tab.`}
+      >
+        <span className="work-title">{project.title}</span>
+        <ArrowUpRight className="work-arrow h-5 w-5" aria-hidden="true" />
+        <span className="work-meta">
+          <span>{project.discipline}</span>
+          <span>{project.technologies.join(', ')}</span>
         </span>
-      ) : null}
-
-      <span className="work-end">
-        <ArrowUpRight className="nudge h-4 w-4 text-[var(--ink-3)]" aria-hidden="true" />
-      </span>
-    </a>
+        {/* The adjacent preview never fires on a touch screen or a narrow one,
+            so the summary and the screenshot ship in the row there instead. */}
+        <span className="work-summary">{project.summary}</span>
+        <span className="work-shot">
+          <Shot project={project} />
+        </span>
+      </a>
+    </li>
   );
 }
 
 export function WorkSection() {
-  const [activeSlug, setActiveSlug] = useState(projects[0].slug);
+  const [active, setActive] = useState(projects[0].slug);
+  const [previous, setPrevious] = useState<string | null>(null);
+
+  const raise = (slug: string) => {
+    if (slug === active) return;
+    setPrevious(active);
+    setActive(slug);
+  };
 
   return (
-    <section id="work" className="shell">
-      <div className="indent pb-20 md:pb-28">
-        <div className="flex items-baseline justify-between">
-          <p className="mono">Selected work</p>
-          <p className="mono">{String(projects.length).padStart(2, '0')}</p>
-        </div>
+    <section id="work" className="section shell">
+      <Chapter word="Work" />
 
-        <h2 className="t-lead duo mt-6 max-w-[46ch]">
-          <b>Seven products, shipped.</b> Wealth management, transplant diagnostics, renewable
-          energy, commerce, and a CarPlay app.
-        </h2>
+      <div className="section-lead">
+        <p className="t-lead">Seven products, shipped.</p>
+        <p className="t-body">
+          Wealth management, transplant diagnostics, renewable energy, commerce, and a CarPlay app.
+        </p>
+      </div>
 
-        <div className="work-body mt-10 md:mt-12">
-          <div>
-            {projects.map((project, i) => (
-              <Row
-                key={project.slug}
-                project={project}
-                index={i}
-                onEnter={() => setActiveSlug(project.slug)}
-              />
-            ))}
-          </div>
+      <div className="work-body">
+        <ul className="work-list">
+          {projects.map((project) => (
+            <Row
+              key={project.slug}
+              project={project}
+              active={project.slug === active}
+              onEnter={() => raise(project.slug)}
+            />
+          ))}
+        </ul>
 
-          <Preview activeSlug={activeSlug} />
-        </div>
+        <Preview active={active} previous={previous} />
       </div>
     </section>
   );

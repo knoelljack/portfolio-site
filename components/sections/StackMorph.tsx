@@ -89,17 +89,18 @@ const IDLE_MS = 3400;
    the stage for the rest of the session. */
 const PIN_RELEASE_MS = 9000;
 
-/* Predominantly ink with a thinning tail of grey: the mark has to read as one
-   shape first and as texture second. */
+/* Predominantly white with a thinning tail of haze: the mark has to read as
+   one shape first and as texture second. Travellers flash the page's orange,
+   as they do when the reel's field lands the name. */
 const TONES = [
-  [17, 17, 20],
-  [27, 27, 32],
-  [42, 42, 49],
-  [74, 74, 82],
-  [116, 116, 124],
+  [255, 255, 255],
+  [244, 243, 255],
+  [226, 224, 255],
+  [200, 196, 255],
+  [168, 162, 255],
 ] as const;
 const TONE_WEIGHTS = [0.44, 0.24, 0.16, 0.1, 0.06];
-const ACCENT = [65, 55, 255] as const;
+const ACCENT = [255, 138, 61] as const;
 const BLENDS = 8;
 
 /** One string per (tone, accent blend), built once so the draw loop never has
@@ -537,7 +538,7 @@ export function StackMorph() {
         <div className="stack-stage" ref={stageRef}>
           <canvas ref={canvasRef} aria-hidden="true" />
         </div>
-        <p className="mono stack-caption">{tech.label}</p>
+        <p className="t-tag stack-caption">{tech.label}</p>
       </div>
 
       <div className="stack-list-col">
@@ -548,7 +549,7 @@ export function StackMorph() {
         </p>
         {GROUPS.map(({ group, items }) => (
           <div key={group} className="stack-group">
-            <p className="mono">{group}</p>
+            <p className="t-label">{group}</p>
             <ul className="stack-names">
               {items.map(({ label, index }) => (
                 <li key={label}>
