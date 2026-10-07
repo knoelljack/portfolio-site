@@ -1,11 +1,12 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { createPacer, type Pacer } from './pacer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
  * The page after the reel: one scrubbed timeline over a sticky stage, told
- * in screens of scroll and snapped to each beat's rest.
+ * in screens of scroll, with the page paced from one beat's rest to the next.
  *
  *   name → the pixel at the end of the lede grows into a field while the name
  *   rises away and "Interfaces" squeezes in across it (the reel's own card
@@ -16,7 +17,8 @@ gsap.registerPlugin(ScrollTrigger);
  *   in → the contact cover rises in columns, the reel's flood.
  *
  * Every exit is the next beat's entrance: the field is never hidden between
- * beats, it only changes shape and colour.
+ * beats, it only changes shape and colour. The pacer moves the page between
+ * the beats' rests, one input at a time.
  */
 
 export type StoryControls = { kill: () => void };
@@ -40,7 +42,7 @@ const FROM_RIGHT = 'inset(0% 0% 0% 100%)';
 
 type Rect = { x: number; y: number; w: number; h: number };
 
-export function createStory(track: HTMLElement, snapping = true): StoryControls {
+export function createStory(track: HTMLElement, pacing = true): StoryControls {
   const html = document.documentElement;
   const one = <T extends Element = HTMLElement>(sel: string, root: ParentNode = track) =>
     root.querySelector<T>(sel)!;
@@ -290,7 +292,7 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
     /* ---------- the stack → contact: the cover floods up ---------- */
 
     // Everything ends by `len`: a tween running past it would stretch the
-    // timeline, and every rest, anchor and snap would land a little late.
+    // timeline, and every rest, anchor and paced move would land a little late.
     tl.to(columns, { yPercent: 0, duration: len - SYSTEMS }, SYSTEMS);
     tl.to(
       coverChars,
@@ -310,20 +312,9 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
       // stage's release whatever the address bar is doing.
       end: () => `+=${len * svh()}`,
       animation: tl,
-      scrub: 0.6,
-      // Let go and the story glides on to the next beat's rest: the reader
-      // is carried from beat to beat rather than left between two.
-      // Without inertia: a flick carries the reader one beat on from where it
-      // comes to rest, never several beats past what they chose.
-      snap: snapping
-        ? {
-            snapTo: 'labelsDirectional',
-            duration: { min: 0.3, max: 0.9 },
-            delay: 0.06,
-            ease: 'power3.inOut',
-            inertia: false,
-          }
-        : undefined,
+      // The pacer already eases every move, so the timeline follows the scroll
+      // exactly rather than smoothing it a second time.
+      scrub: true,
       // No invalidateOnRefresh: it reverts the timeline on every refresh —
       // including the one on window load — which wipes the starting states
       // set above. Layout-dependent values are rebuilt on resize instead.
@@ -379,15 +370,18 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
 
   const yFor = (t: number) => (st ? st.start + (t / len) * (st.end - st.start) : 0);
 
-  /** Complete the scrub at once: a jump should land, not replay the story. */
+  let pacer: Pacer | null = null;
+
+  /** A jump lands at once: any paced move in flight is dropped, not finished. */
   const settle = () => {
+    pacer?.stop();
     ScrollTrigger.update();
-    st?.getTween()?.progress(1);
   };
 
   const jumpTo = (t: number) => {
+    pacer?.stop();
     window.scrollTo({ top: yFor(t), behavior: 'instant' });
-    settle();
+    ScrollTrigger.update();
   };
 
   // The beats' ids move from their layers on the stage to anchors in the
@@ -411,10 +405,14 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
     return { id, layer, anchor };
   });
 
+  // A progress square is a long jump, made under the cover rather than
+  // fast-forwarding through the posters between.
   const onClick = (e: MouseEvent) => {
     const sq = e.target instanceof Element ? e.target.closest<HTMLElement>('.s-sq') : null;
     if (!sq || !st) return;
-    window.scrollTo({ top: yFor(posterAt(Number(sq.dataset.sq))), behavior: 'smooth' });
+    const t = posterAt(Number(sq.dataset.sq));
+    if (pacer) pacer.cut(yFor(t));
+    else jumpTo(t);
   };
 
   // A keyboard reader tabbing to a project that is not on stage is carried to
@@ -484,6 +482,7 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
       width = window.innerWidth;
       small = svh();
       const at = st?.progress ?? 0;
+      pacer?.stop();
       teardownTimeline();
       build();
       ScrollTrigger.refresh();
@@ -508,6 +507,21 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
   ScrollTrigger.config({ ignoreMobileResize: true });
   build();
   ScrollTrigger.refresh();
+
+  if (pacing) {
+    const cut = all('.s-cut-col');
+    pacer = createPacer({
+      beats: () =>
+        tl && st
+          ? Object.values(tl.labels)
+              .sort((a, b) => a - b)
+              .map(yFor)
+          : [0],
+      blocked: () =>
+        html.hasAttribute('data-intro') || !!document.querySelector('.menu[data-open]'),
+      cover: () => cut,
+    });
+  }
 
   // A deep link that arrived before the anchors did was scrolled to the
   // beat's layer instead, so it is landed again here — and once more after
@@ -561,6 +575,8 @@ export function createStory(track: HTMLElement, snapping = true): StoryControls 
       window.removeEventListener(type, onInput);
     }
     motion.removeEventListener('change', onMotion);
+    pacer?.destroy();
+    pacer = null;
     teardownTimeline();
     probe.remove();
     for (const { id, layer, anchor } of anchors) {

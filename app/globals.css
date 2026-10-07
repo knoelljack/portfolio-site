@@ -1157,8 +1157,15 @@ textarea.field {
 
 .s-field,
 .s-card,
-.s-progress {
+.s-progress,
+.s-cut {
   display: none;
+}
+
+/* The pacer eases every move itself; a fragment the browser follows on its
+   own (back, forward, a typed hash) is a jump, not a run through the story. */
+html[data-scenes] {
+  scroll-behavior: auto;
 }
 
 html[data-scenes] .story {
@@ -1298,6 +1305,31 @@ html[data-scenes] .systems-head {
    columns rise one after another; between them the stage shows through. */
 html[data-scenes] .contact {
   margin-top: -100lvh;
+}
+
+html[data-scenes] .s-cut {
+  display: grid;
+  position: fixed;
+  inset: 0;
+  z-index: 54;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  pointer-events: none;
+}
+
+.s-cut-col {
+  margin-right: -1px;
+  background: var(--orange);
+  transform: scaleY(0);
+}
+
+@media (max-aspect-ratio: 5/4) {
+  html[data-scenes] .s-cut {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .s-cut-col:nth-child(n + 5) {
+    display: none;
+  }
 }
 
 .story-anchor {

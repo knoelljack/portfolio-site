@@ -26,11 +26,10 @@ export function Story({ children }: { children: React.ReactNode }) {
     Promise.all([import('./engine'), document.fonts.ready]).then(([{ createStory }]) => {
       // The head script's failsafe may have given up on us while we loaded.
       if (cancelled || !html.hasAttribute('data-scenes')) return;
-      // Development only: `?nosnap` parks the story between rests, so a frame
-      // mid-move can be inspected.
-      const snapping =
-        process.env.NODE_ENV === 'production' || !/[?&]nosnap\b/.test(location.search);
-      story = createStory(track, snapping);
+      // Development only: `?nopace` hands scrolling back to the browser, so a
+      // frame between two rests can be parked on and inspected.
+      const pacing = process.env.NODE_ENV === 'production' || !/[?&]nopace\b/.test(location.search);
+      story = createStory(track, pacing);
       (window as unknown as { __story?: boolean }).__story = true;
     });
 
@@ -71,6 +70,12 @@ export function Story({ children }: { children: React.ReactNode }) {
           ))}
           <span className="s-marker" />
         </div>
+      </div>
+      {/* The cover a long jump is made under: Home, End, a progress square. */}
+      <div className="s-cut" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} className="s-cut-col" />
+        ))}
       </div>
     </div>
   );
